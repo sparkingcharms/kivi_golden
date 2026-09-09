@@ -1,0 +1,3 @@
+# Product positioning statement
+
+Kivi is a personal multilingual voice layer for people who think, create and communicate more freely than they type. It connects your voice to the context of the computer: the screen tells Kivi where, your speech tells it what, and Kivi understands the intent. Across apps, Kivi helps you Think, Write, Understand, Communicate and Remember, while keeping you in control. Its greatest value compounds through personalization, learning your vocabulary, styles, shortcuts, modes and ways of working. Kivi must remain a layer, not a destination: it should never become a generic chatbot, passive dictation tool, app replacement, or autonomous agent.

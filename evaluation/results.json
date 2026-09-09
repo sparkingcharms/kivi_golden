@@ -1,0 +1,4072 @@
+{
+  "summary": {
+    "backend": "local",
+    "records": 500,
+    "wall_clock_s": 0.18,
+    "ingest_latency_ms": {
+      "p50": 0.21,
+      "p95": 0.37,
+      "max": 1.34
+    },
+    "db_bytes_final": 5009104,
+    "db_bytes_per_record": 10018.2,
+    "db_growth": [
+      [
+        0,
+        238776
+      ],
+      [
+        50,
+        4082736
+      ],
+      [
+        100,
+        4320736
+      ],
+      [
+        150,
+        4410920
+      ],
+      [
+        200,
+        4521680
+      ],
+      [
+        250,
+        4615888
+      ],
+      [
+        300,
+        4685520
+      ],
+      [
+        350,
+        4783824
+      ],
+      [
+        400,
+        4865744
+      ],
+      [
+        450,
+        4931280
+      ],
+      [
+        500,
+        5009104
+      ]
+    ],
+    "traces": 513,
+    "model_calls": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0.0,
+    "memory_counts": {
+      "fact/active": 10,
+      "preference/active": 13,
+      "episode/active": 490
+    },
+    "policy": {
+      "dictation_reads": [
+        "fact"
+      ],
+      "heykivi_reads": [
+        "fact",
+        "preference",
+        "episode"
+      ],
+      "promotion_observations": 3,
+      "extract_confidence_floor": 0.55,
+      "fact_offer_after_hearings": 2,
+      "retrieval_top_k": 6,
+      "retrieval_floor": 0.12,
+      "episode_half_life_hours": 72.0,
+      "intent_floor": 0.3,
+      "intent_margin": 0.08,
+      "ambiguous_referent_asks": true,
+      "never_learn": [
+        "credential",
+        "financial_id",
+        "health",
+        "third_party_pii"
+      ]
+    }
+  },
+  "scores": {
+    "fact_recall": "100.0%",
+    "fact_direction_correct": "100.0%",
+    "preference_activation": "100.0%",
+    "observed_not_applied": "100.0%",
+    "refusal": "100.0%",
+    "reminder_capture": "100.0%",
+    "false_facts": 0,
+    "false_preferences": 0,
+    "retrieval": "100.0%",
+    "e2e_passed": "100.0%"
+  },
+  "counters": {
+    "fact_expected": 10,
+    "fact_found": 10,
+    "fact_direction_ok": 10,
+    "pref_expected": 9,
+    "pref_found": 9,
+    "pref_observed_expected": 12,
+    "pref_observed_ok": 12,
+    "refuse_expected": 14,
+    "refuse_ok": 14,
+    "false_facts": 0,
+    "false_prefs": 0,
+    "reminder_expected": 4,
+    "reminder_ok": 4
+  },
+  "ingestion_cases": [
+    {
+      "utterance_id": "utt_0098",
+      "input": "spell sem as semester",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "fact",
+          "episode"
+        ],
+        "fact": {
+          "wrong": "sem",
+          "right": "semester"
+        }
+      },
+      "created": [
+        {
+          "kind": "fact",
+          "body": "sem → semester",
+          "status": "active",
+          "reason": "an in-place spelling while dictating",
+          "id": "mem_855948b3b3ad"
+        },
+        {
+          "kind": "episode",
+          "body": "spell sem as semester",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_e72b1107c523"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_0ca1d3b3a81d",
+      "latency_ms": 0.25
+    },
+    {
+      "utterance_id": "utt_0100",
+      "input": "no, Saaras not Sarah's",
+      "app": "Slack",
+      "expected": {
+        "kinds": [
+          "fact",
+          "episode"
+        ],
+        "fact": {
+          "wrong": "sarah's",
+          "right": "Saaras"
+        }
+      },
+      "created": [
+        {
+          "kind": "fact",
+          "body": "Sarah's → Saaras",
+          "status": "active",
+          "reason": "an in-place correction while dictating",
+          "id": "mem_03236072cbcd"
+        },
+        {
+          "kind": "episode",
+          "body": "no, Saaras not Sarah's",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_c9840db8e90b"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_d943b9f825f0",
+      "latency_ms": 0.16
+    },
+    {
+      "utterance_id": "utt_0110",
+      "input": "it's Arjun, not Arjuna",
+      "app": "Slack",
+      "expected": {
+        "kinds": [
+          "fact",
+          "episode"
+        ],
+        "fact": {
+          "wrong": "arjuna",
+          "right": "Arjun"
+        }
+      },
+      "created": [
+        {
+          "kind": "fact",
+          "body": "Arjuna → Arjun",
+          "status": "active",
+          "reason": "an in-place correction while dictating",
+          "id": "mem_fd704e639229"
+        },
+        {
+          "kind": "episode",
+          "body": "it's Arjun, not Arjuna",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_454c0c1a1c6d"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_c26132c23f1a",
+      "latency_ms": 0.15
+    },
+    {
+      "utterance_id": "utt_0136",
+      "input": "no — Bulbul, not Bulbull",
+      "app": "Cursor",
+      "expected": {
+        "kinds": [
+          "fact",
+          "episode"
+        ],
+        "fact": {
+          "wrong": "bulbull",
+          "right": "Bulbul"
+        }
+      },
+      "created": [
+        {
+          "kind": "fact",
+          "body": "Bulbull → Bulbul",
+          "status": "active",
+          "reason": "an in-place correction while dictating",
+          "id": "mem_10c9cea6b0b3"
+        },
+        {
+          "kind": "episode",
+          "body": "no — Bulbul, not Bulbull",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_cf0e3617dfd8"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_f66e9793b13b",
+      "latency_ms": 0.15
+    },
+    {
+      "utterance_id": "utt_0140",
+      "input": "add a retry on the 401 but keep the session token unchanged",
+      "app": "Chrome",
+      "expected": {
+        "kinds": [],
+        "refuse": "private"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "dictated while the mic was marked private"
+        }
+      ],
+      "trace_id": "tr_3ebeeae01145",
+      "latency_ms": 0.1
+    },
+    {
+      "utterance_id": "utt_0145",
+      "input": "naan innaikku late-ah varuven, appuram call pannuren",
+      "app": "Cursor",
+      "expected": {
+        "kinds": [],
+        "refuse": "private"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "dictated while the mic was marked private"
+        }
+      ],
+      "trace_id": "tr_121a08b72bcb",
+      "latency_ms": 0.09
+    },
+    {
+      "utterance_id": "utt_0158",
+      "input": "from now on no hedging in my written answers",
+      "app": "Docs",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_active": true
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "No hedging in my written answers",
+          "status": "active",
+          "reason": "stated as a standing instruction",
+          "id": "mem_bec32a6a1ea6"
+        },
+        {
+          "kind": "episode",
+          "body": "from now on no hedging in my written answers",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_5dcd3b845b8d"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_17d056e4197e",
+      "latency_ms": 0.91
+    },
+    {
+      "utterance_id": "utt_0160",
+      "input": "account number ending 4471, IFSC on the invoice",
+      "app": "Slack",
+      "expected": {
+        "kinds": [],
+        "refuse": "financial_id"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "contains financial id; this category is never stored"
+        }
+      ],
+      "trace_id": "tr_bdac50ea6495",
+      "latency_ms": 0.08
+    },
+    {
+      "utterance_id": "utt_0162",
+      "input": "when I say ASR, write speech recognition",
+      "app": "Docs",
+      "expected": {
+        "kinds": [
+          "fact",
+          "episode"
+        ],
+        "fact": {
+          "wrong": "asr",
+          "right": "speech recognition"
+        }
+      },
+      "created": [
+        {
+          "kind": "fact",
+          "body": "ASR → speech recognition",
+          "status": "active",
+          "reason": "an in-place expansion while dictating",
+          "id": "mem_8762d7de31a9"
+        },
+        {
+          "kind": "episode",
+          "body": "when I say ASR, write speech recognition",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_281ba5dddba0"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_a16899f5aa5e",
+      "latency_ms": 0.17
+    },
+    {
+      "utterance_id": "utt_0178",
+      "input": "the ablation shows the biggest gain on utterances with two switch points",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [],
+        "refuse": "private"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "dictated while the mic was marked private"
+        }
+      ],
+      "trace_id": "tr_f1a71dcae733",
+      "latency_ms": 0.1
+    },
+    {
+      "utterance_id": "utt_0183",
+      "input": "always keep my Slack updates to three bullets",
+      "app": "Cursor",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_active": true
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "Always keep my Slack updates to three bullets",
+          "status": "active",
+          "reason": "stated as a standing instruction",
+          "id": "mem_89e801b94329"
+        },
+        {
+          "kind": "episode",
+          "body": "always keep my Slack updates to three bullets",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_801273d7d022"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_a2a1f67903bb",
+      "latency_ms": 0.29
+    },
+    {
+      "utterance_id": "utt_0186",
+      "input": "naan innaikku late-ah varuven, basically appuram call pannuren",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_observed": "Never stack apologies in a message",
+        "promotes_at": 3,
+        "occurrence": 1
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "Never stack apologies in a message",
+          "status": "observed",
+          "reason": "you edited Kivi's output (removed apologies) — noticed, not applied",
+          "id": "mem_577eb6a0f1ae"
+        },
+        {
+          "kind": "episode",
+          "body": "Naan innaikku late-ah varuven, appuram call pannuren.",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_383380804ab6"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_5054a9c1583d",
+      "latency_ms": 0.31
+    },
+    {
+      "utterance_id": "utt_0187",
+      "input": "her blood pressure reading was high again this week",
+      "app": "Cursor",
+      "expected": {
+        "kinds": [],
+        "refuse": "health"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "contains health; this category is never stored"
+        }
+      ],
+      "trace_id": "tr_a8ba277156e9",
+      "latency_ms": 0.11
+    },
+    {
+      "utterance_id": "utt_0190",
+      "input": "no — Sarvam AI, not Sharvam",
+      "app": "Cursor",
+      "expected": {
+        "kinds": [
+          "fact",
+          "episode"
+        ],
+        "fact": {
+          "wrong": "sharvam",
+          "right": "Sarvam AI"
+        }
+      },
+      "created": [
+        {
+          "kind": "fact",
+          "body": "Sharvam → Sarvam AI",
+          "status": "active",
+          "reason": "an in-place correction while dictating",
+          "id": "mem_0c3f508a1e6d"
+        },
+        {
+          "kind": "episode",
+          "body": "no — Sarvam AI, not Sharvam",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_2bf7a260cdbd"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_da7f14aae8c7",
+      "latency_ms": 0.17
+    },
+    {
+      "utterance_id": "utt_0221",
+      "input": "his Aadhaar number is on the form already",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [],
+        "refuse": "third_party_pii"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "contains third party pii; this category is never stored"
+        }
+      ],
+      "trace_id": "tr_f5e2c5a8c929",
+      "latency_ms": 0.08
+    },
+    {
+      "utterance_id": "utt_0234",
+      "input": "tell so the team latency numbers will land tomorrow morning",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_observed": "Never open with Dear Sir/Madam",
+        "promotes_at": 3,
+        "occurrence": 1
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "Never open with Dear Sir/Madam",
+          "status": "observed",
+          "reason": "you edited Kivi's output (removed greeting Dear Sir) — noticed, not applied",
+          "id": "mem_6befaf4beb73"
+        },
+        {
+          "kind": "episode",
+          "body": "Latency numbers will land tomorrow morning.",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_adfa81d60468"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_812e2a4438fa",
+      "latency_ms": 0.24
+    },
+    {
+      "utterance_id": "utt_0248",
+      "input": "remind me to follow up with Arjun tomorrow",
+      "app": "Slack",
+      "expected": {
+        "kinds": [
+          "episode"
+        ],
+        "reminder": true
+      },
+      "created": [
+        {
+          "kind": "episode",
+          "body": "Reminder: Follow up with Arjun tomorrow",
+          "status": "active",
+          "reason": "an explicit reminder request",
+          "id": "mem_0528b29e4703"
+        },
+        {
+          "kind": "episode",
+          "body": "remind me to follow up with Arjun tomorrow",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_620feb1f380d"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_0d51d5576485",
+      "latency_ms": 0.18
+    },
+    {
+      "utterance_id": "utt_0253",
+      "input": "dinner ku vandhuduven, meeting konjam late aagum",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_observed": "Prefer bullets over paragraphs for updates",
+        "promotes_at": 3,
+        "occurrence": 1
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "Prefer bullets over paragraphs for updates",
+          "status": "observed",
+          "reason": "you edited Kivi's output (rewrote to bullets) — noticed, not applied",
+          "id": "mem_74fe1a5c7ee8"
+        },
+        {
+          "kind": "episode",
+          "body": "Dinner-ku vandhuduven, meeting konjam late aagum.",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_6201f091d514"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_b1d60c767630",
+      "latency_ms": 0.22
+    },
+    {
+      "utterance_id": "utt_0254",
+      "input": "the third seed finished overnight, variance is is smaller than we thought",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_observed": "Never open with Dear Sir/Madam",
+        "promotes_at": 3,
+        "occurrence": 2
+      },
+      "created": [
+        {
+          "kind": "episode",
+          "body": "The third seed finished overnight; variance is smaller than we thought.",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_c4da1e485337"
+        }
+      ],
+      "reinforced": [
+        {
+          "kind": "preference",
+          "body": "Never open with Dear Sir/Madam",
+          "status": "observed",
+          "observations": 2,
+          "reason": "already known; seen 2 times"
+        }
+      ],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_7a6b0d0cffd3",
+      "latency_ms": 0.33
+    },
+    {
+      "utterance_id": "utt_0256",
+      "input": "I pushed the fix for the empty input crash",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [],
+        "refuse": "private"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "dictated while the mic was marked private"
+        }
+      ],
+      "trace_id": "tr_beb574252f3d",
+      "latency_ms": 0.1
+    },
+    {
+      "utterance_id": "utt_0257",
+      "input": "add a so retry on the 401 but keep the session token unchanged",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_observed": "Never stack apologies in a message",
+        "promotes_at": 3,
+        "occurrence": 2
+      },
+      "created": [
+        {
+          "kind": "episode",
+          "body": "Add a retry on the 401, but keep sessionToken unchanged.",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_dc99499ec957"
+        }
+      ],
+      "reinforced": [
+        {
+          "kind": "preference",
+          "body": "Never stack apologies in a message",
+          "status": "observed",
+          "observations": 2,
+          "reason": "already known; seen 2 times"
+        }
+      ],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_2387da05bb05",
+      "latency_ms": 0.23
+    },
+    {
+      "utterance_id": "utt_0281",
+      "input": "I prefer bullets over paragraphs for updates",
+      "app": "Docs",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_active": true
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "Bullets over paragraphs for updates",
+          "status": "active",
+          "reason": "stated as a standing instruction",
+          "id": "mem_8d24a3ffdd16"
+        },
+        {
+          "kind": "episode",
+          "body": "I prefer bullets over paragraphs for updates",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_b2a0a31e6d7a"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_407f8320c1a9",
+      "latency_ms": 0.25
+    },
+    {
+      "utterance_id": "utt_0286",
+      "input": "check whether the encoder handles more than two switch points",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_observed": "Prefer bullets over paragraphs for updates",
+        "promotes_at": 3,
+        "occurrence": 2
+      },
+      "created": [
+        {
+          "kind": "episode",
+          "body": "Check whether the encoder handles more than two switch points.",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_14f014360a14"
+        }
+      ],
+      "reinforced": [
+        {
+          "kind": "preference",
+          "body": "Prefer bullets over paragraphs for updates",
+          "status": "observed",
+          "observations": 2,
+          "reason": "already known; seen 2 times"
+        }
+      ],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_2de207992c94",
+      "latency_ms": 0.23
+    },
+    {
+      "utterance_id": "utt_0287",
+      "input": "the API key is sk-live-9f2b, keep it somewhere",
+      "app": "Slack",
+      "expected": {
+        "kinds": [],
+        "refuse": "credential"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "contains credential; this category is never stored"
+        }
+      ],
+      "trace_id": "tr_fdb9ca96ab67",
+      "latency_ms": 0.09
+    },
+    {
+      "utterance_id": "utt_0303",
+      "input": "my password for the portal is kivi@2026",
+      "app": "Slack",
+      "expected": {
+        "kinds": [],
+        "refuse": "credential"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "contains credential; this category is never stored"
+        }
+      ],
+      "trace_id": "tr_cc39f5789e0f",
+      "latency_ms": 0.08
+    },
+    {
+      "utterance_id": "utt_0317",
+      "input": "remind me to check the third seed at 11 PM",
+      "app": "Slack",
+      "expected": {
+        "kinds": [
+          "episode"
+        ],
+        "reminder": true
+      },
+      "created": [
+        {
+          "kind": "episode",
+          "body": "Reminder: Check the third seed",
+          "status": "active",
+          "reason": "an explicit reminder request",
+          "id": "mem_5da2b92a48f9"
+        },
+        {
+          "kind": "episode",
+          "body": "remind me to check the third seed at 11 PM",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_03d6ada0c6a8"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_3f21672c0238",
+      "latency_ms": 0.18
+    },
+    {
+      "utterance_id": "utt_0320",
+      "input": "from now on never write Dear Sir or Madam",
+      "app": "WhatsApp",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_active": true
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "Never write Dear Sir or Madam",
+          "status": "active",
+          "reason": "stated as a standing instruction",
+          "id": "mem_fe1ea8b1fa30"
+        },
+        {
+          "kind": "episode",
+          "body": "from now on never write Dear Sir or Madam",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_54105ce103d4"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_abd5c61c59b9",
+      "latency_ms": 0.25
+    },
+    {
+      "utterance_id": "utt_0325",
+      "input": "I prefer formal wording when I write to the professor",
+      "app": "WhatsApp",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_active": true
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "Formal wording when I write to the professor",
+          "status": "active",
+          "reason": "stated as a standing instruction",
+          "id": "mem_ec833d181c6d"
+        },
+        {
+          "kind": "episode",
+          "body": "I prefer formal wording when I write to the professor",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_9846dd795437"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_bee2a2965de7",
+      "latency_ms": 0.23
+    },
+    {
+      "utterance_id": "utt_0331",
+      "input": "I'm so not able able to attend Friday, there's a family function",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_observed": "Prefer bullets over paragraphs for updates",
+        "promotes_at": 3,
+        "occurrence": 3
+      },
+      "created": [
+        {
+          "kind": "episode",
+          "body": "I won't be able to attend Friday — I have a family commitment.",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_0467ee239c93"
+        }
+      ],
+      "reinforced": [
+        {
+          "kind": "preference",
+          "body": "Prefer bullets over paragraphs for updates",
+          "status": "active",
+          "observations": 3,
+          "reason": "already known; seen 3 times, promoted at 3"
+        }
+      ],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "a possible correction",
+          "reason": "could not tell which word was being corrected"
+        }
+      ],
+      "trace_id": "tr_7ef4815b2372",
+      "latency_ms": 0.26
+    },
+    {
+      "utterance_id": "utt_0338",
+      "input": "the OTP step was the block in onboarding, drop off was thirty thirty eight percent",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_observed": "Keep emails to three sentences unless I ask for more",
+        "promotes_at": 3,
+        "occurrence": 1
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "Keep emails to three sentences unless I ask for more",
+          "status": "observed",
+          "reason": "you edited Kivi's output (shortened by about a third) — noticed, not applied",
+          "id": "mem_85cb89957939"
+        },
+        {
+          "kind": "episode",
+          "body": "The OTP step was the block in onboarding; drop-off was 38%.",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_935f39a55b7a"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_2c57fb7679c5",
+      "latency_ms": 0.3
+    },
+    {
+      "utterance_id": "utt_0339",
+      "input": "shared the tracker with design and engineering both",
+      "app": "Slack",
+      "expected": {
+        "kinds": [],
+        "refuse": "private"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "dictated while the mic was marked private"
+        }
+      ],
+      "trace_id": "tr_f4d283fb9b6e",
+      "latency_ms": 0.1
+    },
+    {
+      "utterance_id": "utt_0352",
+      "input": "spell Kavya as Kaavya",
+      "app": "Chrome",
+      "expected": {
+        "kinds": [
+          "fact",
+          "episode"
+        ],
+        "fact": {
+          "wrong": "kavya",
+          "right": "Kaavya"
+        }
+      },
+      "created": [
+        {
+          "kind": "fact",
+          "body": "Kavya → Kaavya",
+          "status": "active",
+          "reason": "an in-place spelling while dictating",
+          "id": "mem_9b74b677078f"
+        },
+        {
+          "kind": "episode",
+          "body": "spell Kavya as Kaavya",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_4b047c873eff"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_1722e9e020fe",
+      "latency_ms": 0.19
+    },
+    {
+      "utterance_id": "utt_0369",
+      "input": "the ablation shows the biggest gain on utterances with two switch points",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_observed": "Never open with Dear Sir/Madam",
+        "promotes_at": 3,
+        "occurrence": 3
+      },
+      "created": [
+        {
+          "kind": "episode",
+          "body": "The ablation shows the biggest gain on utterances with two switch points.",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_a15c0aa3ce35"
+        }
+      ],
+      "reinforced": [
+        {
+          "kind": "preference",
+          "body": "Never open with Dear Sir/Madam",
+          "status": "active",
+          "observations": 3,
+          "reason": "already known; seen 3 times, promoted at 3"
+        }
+      ],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_0d2a8d10cfb7",
+      "latency_ms": 0.24
+    },
+    {
+      "utterance_id": "utt_0378",
+      "input": "it's Meera, not Mira",
+      "app": "Notion",
+      "expected": {
+        "kinds": [
+          "fact",
+          "episode"
+        ],
+        "fact": {
+          "wrong": "mira",
+          "right": "Meera"
+        }
+      },
+      "created": [
+        {
+          "kind": "fact",
+          "body": "Mira → Meera",
+          "status": "active",
+          "reason": "an in-place correction while dictating",
+          "id": "mem_6b5288f0d84c"
+        },
+        {
+          "kind": "episode",
+          "body": "it's Meera, not Mira",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_70eca9e02713"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_5da7539cefaf",
+      "latency_ms": 0.17
+    },
+    {
+      "utterance_id": "utt_0379",
+      "input": "the OTP step was the block in onboarding, drop off was thirty eight percent",
+      "app": "Cursor",
+      "expected": {
+        "kinds": [],
+        "refuse": "private"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "dictated while the mic was marked private"
+        }
+      ],
+      "trace_id": "tr_d7cfdb323c17",
+      "latency_ms": 0.2
+    },
+    {
+      "utterance_id": "utt_0392",
+      "input": "remind me to tell Kavya about the event at 9 PM",
+      "app": "Slack",
+      "expected": {
+        "kinds": [
+          "episode"
+        ],
+        "reminder": true
+      },
+      "created": [
+        {
+          "kind": "episode",
+          "body": "Reminder: Tell Kavya about the event",
+          "status": "active",
+          "reason": "an explicit reminder request",
+          "id": "mem_18090ba0d4a0"
+        },
+        {
+          "kind": "episode",
+          "body": "remind me to tell Kaavya about the event at 9 PM",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_fffc6b1685b6"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_3325765d40de",
+      "latency_ms": 0.26
+    },
+    {
+      "utterance_id": "utt_0409",
+      "input": "remember that I keep emails to three sentences",
+      "app": "Notion",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_active": true
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "I keep emails to three sentences",
+          "status": "active",
+          "reason": "stated as a standing instruction",
+          "id": "mem_efb7479c11ab"
+        },
+        {
+          "kind": "episode",
+          "body": "remember that I keep emails to three sentences",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_4d2e803c6b99"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_8944fda430c8",
+      "latency_ms": 0.47
+    },
+    {
+      "utterance_id": "utt_0422",
+      "input": "always put the number first in a status update",
+      "app": "WhatsApp",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_active": true
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "Always put the number first in a status update",
+          "status": "active",
+          "reason": "stated as a standing instruction",
+          "id": "mem_ef2fa25cf6ab"
+        },
+        {
+          "kind": "episode",
+          "body": "always put the number first in a status update",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_a77e47a8323b"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_4872a9570eef",
+      "latency_ms": 0.25
+    },
+    {
+      "utterance_id": "utt_0423",
+      "input": "tell the okay so okay so team latency numbers will land tomorrow morning",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_observed": "Keep emails to three sentences unless I ask for more",
+        "promotes_at": 3,
+        "occurrence": 2
+      },
+      "created": [
+        {
+          "kind": "episode",
+          "body": "Latency numbers will land tomorrow morning.",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_b85999dbf833"
+        }
+      ],
+      "reinforced": [
+        {
+          "kind": "preference",
+          "body": "Keep emails to three sentences unless I ask for more",
+          "status": "observed",
+          "observations": 2,
+          "reason": "already known; seen 2 times"
+        }
+      ],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_8dfeb7979d73",
+      "latency_ms": 0.24
+    },
+    {
+      "utterance_id": "utt_0428",
+      "input": "the OTP is 449281, use it before it expires",
+      "app": "WhatsApp",
+      "expected": {
+        "kinds": [],
+        "refuse": "credential"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "contains credential; this category is never stored"
+        }
+      ],
+      "trace_id": "tr_e829849d4b6d",
+      "latency_ms": 0.12
+    },
+    {
+      "utterance_id": "utt_0439",
+      "input": "the third seed finished overnight, variance is smaller than we thought",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_observed": "Never stack apologies in a message",
+        "promotes_at": 3,
+        "occurrence": 3
+      },
+      "created": [
+        {
+          "kind": "episode",
+          "body": "The third seed finished overnight; variance is smaller than we thought.",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_9c120e5a9bf3"
+        }
+      ],
+      "reinforced": [
+        {
+          "kind": "preference",
+          "body": "Never stack apologies in a message",
+          "status": "active",
+          "observations": 3,
+          "reason": "already known; seen 3 times, promoted at 3"
+        }
+      ],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_d3093a44d1be",
+      "latency_ms": 0.23
+    },
+    {
+      "utterance_id": "utt_0446",
+      "input": "the doctor changed my prescription yesterday",
+      "app": "Cursor",
+      "expected": {
+        "kinds": [],
+        "refuse": "health"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "contains health; this category is never stored"
+        }
+      ],
+      "trace_id": "tr_d5727ec2ae8c",
+      "latency_ms": 0.1
+    },
+    {
+      "utterance_id": "utt_0452",
+      "input": "it's Tanglish, not Tamlish",
+      "app": "Cursor",
+      "expected": {
+        "kinds": [
+          "fact",
+          "episode"
+        ],
+        "fact": {
+          "wrong": "tamlish",
+          "right": "Tanglish"
+        }
+      },
+      "created": [
+        {
+          "kind": "fact",
+          "body": "Tamlish → Tanglish",
+          "status": "active",
+          "reason": "an in-place correction while dictating",
+          "id": "mem_a5f37f6ee40f"
+        },
+        {
+          "kind": "episode",
+          "body": "it's Tanglish, not Tamlish",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_a53ff287ea13"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_8d7b3ea480e6",
+      "latency_ms": 0.26
+    },
+    {
+      "utterance_id": "utt_0453",
+      "input": "duplicate tickets dropped to almost none within a month",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_observed": "Keep emails to three sentences unless I ask for more",
+        "promotes_at": 3,
+        "occurrence": 3
+      },
+      "created": [
+        {
+          "kind": "episode",
+          "body": "Duplicate tickets dropped to almost none within a month.",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_ba540f427f90"
+        }
+      ],
+      "reinforced": [
+        {
+          "kind": "preference",
+          "body": "Keep emails to three sentences unless I ask for more",
+          "status": "active",
+          "observations": 3,
+          "reason": "already known; seen 3 times, promoted at 3"
+        }
+      ],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_7ffeb6f55aa7",
+      "latency_ms": 0.32
+    },
+    {
+      "utterance_id": "utt_0462",
+      "input": "remind me to send the deck at 6",
+      "app": "Slack",
+      "expected": {
+        "kinds": [
+          "episode"
+        ],
+        "reminder": true
+      },
+      "created": [
+        {
+          "kind": "episode",
+          "body": "Reminder: Send the deck at 6",
+          "status": "active",
+          "reason": "an explicit reminder request",
+          "id": "mem_19974f5879de"
+        },
+        {
+          "kind": "episode",
+          "body": "remind me to send the deck at 6",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_ccc8c30657e1"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_3a924c460208",
+      "latency_ms": 0.18
+    },
+    {
+      "utterance_id": "utt_0474",
+      "input": "remember that I want one clear ask per email",
+      "app": "Gmail",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_active": true
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "I want one clear ask per email",
+          "status": "active",
+          "reason": "stated as a standing instruction",
+          "id": "mem_c9febdce6e57"
+        },
+        {
+          "kind": "episode",
+          "body": "remember that I want one clear ask per email",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_757d2cc181d8"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_a811564f0b4a",
+      "latency_ms": 0.33
+    },
+    {
+      "utterance_id": "utt_0475",
+      "input": "remember to explain method sections in Tamil",
+      "app": "WhatsApp",
+      "expected": {
+        "kinds": [
+          "preference",
+          "episode"
+        ],
+        "preference_active": true
+      },
+      "created": [
+        {
+          "kind": "preference",
+          "body": "To explain method sections in Tamil",
+          "status": "active",
+          "reason": "stated as a standing instruction",
+          "id": "mem_9a77df903d0d"
+        },
+        {
+          "kind": "episode",
+          "body": "remember to explain method sections in Tamil",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_efee4bea094f"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [],
+      "trace_id": "tr_7bae971b16ef",
+      "latency_ms": 0.32
+    },
+    {
+      "utterance_id": "utt_0484",
+      "input": "card number 4539 8821 0043 7712 for the booking",
+      "app": "WhatsApp",
+      "expected": {
+        "kinds": [],
+        "refuse": "financial_id"
+      },
+      "created": [],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the whole utterance",
+          "reason": "contains financial id; this category is never stored"
+        }
+      ],
+      "trace_id": "tr_d7f18725805a",
+      "latency_ms": 0.11
+    },
+    {
+      "utterance_id": "utt_0487",
+      "input": "no, Saaras not Sarus",
+      "app": "WhatsApp",
+      "expected": {
+        "kinds": [
+          "fact",
+          "episode"
+        ],
+        "fact": {
+          "wrong": "sarus",
+          "right": "Saaras"
+        }
+      },
+      "created": [
+        {
+          "kind": "fact",
+          "body": "Sarus → Saaras",
+          "status": "active",
+          "reason": "an in-place correction while dictating",
+          "id": "mem_43a6380b2acb"
+        },
+        {
+          "kind": "episode",
+          "body": "no, Saaras not Sarus",
+          "status": "active",
+          "reason": "every dictation is recallable by time, app and content",
+          "id": "mem_2f9e1c9a482a"
+        }
+      ],
+      "reinforced": [],
+      "conflicts": [],
+      "ignored": [
+        {
+          "what": "the content of what you said",
+          "reason": "content is not a rule; Kivi stores how you write, not what you claim"
+        }
+      ],
+      "trace_id": "tr_c8fb2f79d50f",
+      "latency_ms": 0.2
+    }
+  ],
+  "retrieval": [
+    {
+      "query": "find the dictation I did around 5 PM yesterday in Slack",
+      "anchor": "slack_5pm_yesterday",
+      "mode": "ranked",
+      "passed": true,
+      "rank": 1,
+      "app_filter": "slack",
+      "window": "yesterday around 5 pm",
+      "filter_driven": true,
+      "considered": 490,
+      "hits": [
+        {
+          "score": 0.5958,
+          "app": "Slack",
+          "body": "Quick update: the third seed finished and the latency numbers are read",
+          "why": {
+            "similarity": 0.5,
+            "exact_subject_bonus": 0.0,
+            "filter_driven_baseline": 0.5,
+            "recency": 0.8827,
+            "app": "in Slack",
+            "app_factor": 1.35,
+            "time": "yesterday around 5 pm ✓"
+          }
+        }
+      ]
+    },
+    {
+      "query": "what did I say about the family lunch in WhatsApp yesterday",
+      "anchor": "whatsapp_5pm_decoy",
+      "mode": "ranked",
+      "passed": true,
+      "rank": 1,
+      "app_filter": "whatsapp",
+      "window": "yesterday",
+      "filter_driven": false,
+      "considered": 490,
+      "hits": [
+        {
+          "score": 0.3267,
+          "app": "WhatsApp",
+          "body": "The family lunch is on Sunday — tell Amma we'll reach by noon.",
+          "why": {
+            "similarity": 0.2739,
+            "exact_subject_bonus": 0.0,
+            "filter_driven_baseline": 0.0,
+            "recency": 0.8838,
+            "app": "in WhatsApp",
+            "app_factor": 1.35,
+            "time": "yesterday ✓"
+          }
+        },
+        {
+          "score": 0.1343,
+          "app": "WhatsApp",
+          "body": "remember to explain method sections in Tamil",
+          "why": {
+            "similarity": 0.1195,
+            "exact_subject_bonus": 0.0,
+            "filter_driven_baseline": 0.0,
+            "recency": 0.8323,
+            "app": "in WhatsApp",
+            "app_factor": 1.35,
+            "time": "yesterday ✓"
+          }
+        }
+      ]
+    },
+    {
+      "query": "what did I say in WhatsApp yesterday evening",
+      "anchor": "whatsapp_5pm_decoy",
+      "mode": "filtered",
+      "passed": true,
+      "rank": 3,
+      "app_filter": "whatsapp",
+      "window": "yesterday evening",
+      "filter_driven": true,
+      "considered": 490,
+      "hits": [
+        {
+          "score": 0.6122,
+          "app": "WhatsApp",
+          "body": "Kal subah tak numbers bhej dunga.",
+          "why": {
+            "similarity": 0.5,
+            "exact_subject_bonus": 0.0,
+            "filter_driven_baseline": 0.5,
+            "recency": 0.9069,
+            "app": "in WhatsApp",
+            "app_factor": 1.35,
+            "time": "yesterday evening ✓"
+          }
+        },
+        {
+          "score": 0.5969,
+          "app": "WhatsApp",
+          "body": "no, Saaras not Sarus",
+          "why": {
+            "similarity": 0.5,
+            "exact_subject_bonus": 0.0,
+            "filter_driven_baseline": 0.5,
+            "recency": 0.8843,
+            "app": "in WhatsApp",
+            "app_factor": 1.35,
+            "time": "yesterday evening ✓"
+          }
+        },
+        {
+          "score": 0.5965,
+          "app": "WhatsApp",
+          "body": "The family lunch is on Sunday — tell Amma we'll reach by noon.",
+          "why": {
+            "similarity": 0.5,
+            "exact_subject_bonus": 0.0,
+            "filter_driven_baseline": 0.5,
+            "recency": 0.8838,
+            "app": "in WhatsApp",
+            "app_factor": 1.35,
+            "time": "yesterday evening ✓"
+          }
+        }
+      ]
+    }
+  ],
+  "end_to_end": [
+    {
+      "id": "chain_slack_5pm",
+      "ask": "find the dictation I did around 5 PM yesterday in Slack and polish it for the meeting I'm walking into",
+      "selection": null,
+      "intent": "find_dictation",
+      "confidence": 0.9,
+      "status": "found_and_reshaped",
+      "say": "Found it.",
+      "checks": {
+        "intent": true,
+        "status": true,
+        "episode_app": true,
+        "reshaped": true
+      },
+      "passed": true,
+      "trace_id": "tr_d3dea46c666b",
+      "latency_ms": 9.73,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {
+        "episode": {
+          "id": "mem_8142601718b4",
+          "kind": "episode",
+          "body": "Quick update: the third seed finished and the latency numbers are ready. I think we should walk through them in the review.",
+          "subject": "quick update the third seed finished and the latency numbers are ready i think w",
+          "status": "active",
+          "payload": {
+            "type": "dictation",
+            "app": "Slack"
+          },
+          "scope_app": "Slack",
+          "created_ts": 1788887557.0,
+          "source_utt": "utt_0485",
+          "score": 0.5958,
+          "why": {
+            "similarity": 0.5,
+            "exact_subject_bonus": 0.0,
+            "filter_driven_baseline": 0.5,
+            "recency": 0.8827,
+            "app": "in Slack",
+            "app_factor": 1.35,
+            "time": "yesterday around 5 pm ✓"
+          }
+        },
+        "reshaped": {
+          "status": "drafted",
+          "before": "Quick update: the third seed finished and the latency numbers are ready. I think we should walk through them in the review.",
+          "after": "• Quick update: the third seed finished and the latency numbers are ready\n• we should walk through them in the review",
+          "applied": [
+            "no hedging",
+            "2 bullets"
+          ],
+          "applied_memory_ids": [
+            "mem_bec32a6a1ea6"
+          ],
+          "rules_considered": [
+            "To explain method sections in Tamil",
+            "I want one clear ask per email",
+            "Keep emails to three sentences unless I ask for more",
+            "Never stack apologies in a message",
+            "Always put the number first in a status update",
+            "I keep emails to three sentences",
+            "Never open with Dear Sir/Madam",
+            "Prefer bullets over paragraphs for updates",
+            "Formal wording when I write to the professor",
+            "Never write Dear Sir or Madam",
+            "Bullets over paragraphs for updates",
+            "Always keep my Slack updates to three bullets",
+            "No hedging in my written answers"
+          ]
+        }
+      },
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "find_dictation",
+            "confidence": 0.9,
+            "margin": 0.4168,
+            "scores": {
+              "find_dictation": 0.9,
+              "reshape": 0.4832,
+              "recall": 0.188,
+              "draft_message": 0.299,
+              "remember": 0.0814,
+              "forget": 0.1949
+            },
+            "floor": 0.3
+          }
+        },
+        {
+          "seq": 2,
+          "stage": "parse_reference",
+          "detail": {
+            "time_window": {
+              "start": 1788881400.0,
+              "end": 1788892200.0,
+              "label": "yesterday around 5 pm",
+              "tolerance_h": 1.5
+            },
+            "app": "slack"
+          }
+        },
+        {
+          "seq": 3,
+          "stage": "retrieve",
+          "detail": {
+            "considered": 490,
+            "floor": 0.12,
+            "filters": {
+              "kinds": [
+                "episode"
+              ],
+              "app": "slack",
+              "window": {
+                "start": 1788881400.0,
+                "end": 1788892200.0,
+                "label": "yesterday around 5 pm",
+                "tolerance_h": 1.5
+              },
+              "filter_driven": true
+            },
+            "hits": [
+              {
+                "id": "mem_8142601718b4",
+                "score": 0.5958,
+                "body": "Quick update: the third seed finished and the latency numbers are ready. I think we should",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.8827,
+                  "app": "in Slack",
+                  "app_factor": 1.35,
+                  "time": "yesterday around 5 pm ✓"
+                }
+              }
+            ],
+            "below_floor": [
+              {
+                "id": "mem_e321de30c871",
+                "score": 0.0667,
+                "body": "Add a retry on the 401, but keep sessionToken unchanged.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.8896,
+                  "app": "not in slack",
+                  "app_factor": 0.15,
+                  "time": "yesterday around 5 pm ✓"
+                }
+              },
+              {
+                "id": "mem_78e3652eb401",
+                "score": 0.0664,
+                "body": "Duplicate tickets dropped to almost none within a month.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.8852,
+                  "app": "not in slack",
+                  "app_factor": 0.15,
+                  "time": "yesterday around 5 pm ✓"
+                }
+              },
+              {
+                "id": "mem_1607f69b660e",
+                "score": 0.0663,
+                "body": "The family lunch is on Sunday — tell Amma we'll reach by noo",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.8838,
+                  "app": "not in slack",
+                  "app_factor": 0.15,
+                  "time": "yesterday around 5 pm ✓"
+                }
+              },
+              {
+                "id": "mem_2f9e1c9a482a",
+                "score": 0.0663,
+                "body": "no, Saaras not Sarus",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.8843,
+                  "app": "not in slack",
+                  "app_factor": 0.15,
+                  "time": "yesterday around 5 pm ✓"
+                }
+              },
+              {
+                "id": "mem_d3ffe4a23204",
+                "score": 0.063,
+                "body": "I won't be able to attend Friday — I have a family commitmen",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.9327,
+                  "app": "in Slack",
+                  "app_factor": 0.135,
+                  "time": "yesterday around 5 pm ✗"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "seq": 4,
+          "stage": "chain",
+          "detail": {
+            "reason": "the request asks for a change after the lookup"
+          }
+        },
+        {
+          "seq": 5,
+          "stage": "rules_in_force",
+          "detail": {
+            "count": 13,
+            "rules": [
+              {
+                "id": "mem_9a77df903d0d",
+                "body": "To explain method sections in Tamil"
+              },
+              {
+                "id": "mem_c9febdce6e57",
+                "body": "I want one clear ask per email"
+              },
+              {
+                "id": "mem_85cb89957939",
+                "body": "Keep emails to three sentences unless I ask for more"
+              },
+              {
+                "id": "mem_577eb6a0f1ae",
+                "body": "Never stack apologies in a message"
+              },
+              {
+                "id": "mem_ef2fa25cf6ab",
+                "body": "Always put the number first in a status update"
+              },
+              {
+                "id": "mem_efb7479c11ab",
+                "body": "I keep emails to three sentences"
+              },
+              {
+                "id": "mem_6befaf4beb73",
+                "body": "Never open with Dear Sir/Madam"
+              },
+              {
+                "id": "mem_74fe1a5c7ee8",
+                "body": "Prefer bullets over paragraphs for updates"
+              },
+              {
+                "id": "mem_ec833d181c6d",
+                "body": "Formal wording when I write to the professor"
+              },
+              {
+                "id": "mem_fe1ea8b1fa30",
+                "body": "Never write Dear Sir or Madam"
+              },
+              {
+                "id": "mem_8d24a3ffdd16",
+                "body": "Bullets over paragraphs for updates"
+              },
+              {
+                "id": "mem_89e801b94329",
+                "body": "Always keep my Slack updates to three bullets"
+              },
+              {
+                "id": "mem_bec32a6a1ea6",
+                "body": "No hedging in my written answers"
+              }
+            ]
+          }
+        },
+        {
+          "seq": 6,
+          "stage": "reshape",
+          "detail": {
+            "instruction": "find the dictation I did around 5 PM yesterday in Slack and polish it for the meeting I'm walking into",
+            "applied": [
+              "no hedging",
+              "2 bullets"
+            ],
+            "applied_memory_ids": [
+              "mem_bec32a6a1ea6"
+            ],
+            "unused_rules": [
+              "To explain method sections in Tamil",
+              "I want one clear ask per email",
+              "Keep emails to three sentences unless I ask for more",
+              "Never stack apologies in a message",
+              "Always put the number first in a status update",
+              "I keep emails to three sentences",
+              "Never open with Dear Sir/Madam",
+              "Prefer bullets over paragraphs for updates",
+              "Formal wording when I write to the professor",
+              "Never write Dear Sir or Madam",
+              "Bullets over paragraphs for updates",
+              "Always keep my Slack updates to three bullets"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "find_plain",
+      "ask": "find what I dictated in Gmail yesterday",
+      "selection": null,
+      "intent": "find_dictation",
+      "confidence": 0.9,
+      "status": "ambiguous",
+      "say": "Two of these match. Which one did you mean?",
+      "checks": {
+        "intent": true,
+        "status": true
+      },
+      "passed": true,
+      "trace_id": "tr_3677d994b9cd",
+      "latency_ms": 11.03,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {},
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "find_dictation",
+            "confidence": 0.9,
+            "margin": 0.6959,
+            "scores": {
+              "find_dictation": 0.9,
+              "reshape": 0.0,
+              "recall": 0.2041,
+              "draft_message": 0.0,
+              "remember": 0.1443,
+              "forget": 0.1667
+            },
+            "floor": 0.3
+          }
+        },
+        {
+          "seq": 2,
+          "stage": "parse_reference",
+          "detail": {
+            "time_window": {
+              "start": 1788825600.0,
+              "end": 1788912000.0,
+              "label": "yesterday",
+              "tolerance_h": 12.0
+            },
+            "app": "gmail"
+          }
+        },
+        {
+          "seq": 3,
+          "stage": "retrieve",
+          "detail": {
+            "considered": 490,
+            "floor": 0.12,
+            "filters": {
+              "kinds": [
+                "episode"
+              ],
+              "app": "gmail",
+              "window": {
+                "start": 1788825600.0,
+                "end": 1788912000.0,
+                "label": "yesterday",
+                "tolerance_h": 12.0
+              },
+              "filter_driven": true
+            },
+            "hits": [
+              {
+                "id": "mem_e3e4219ba5b9",
+                "score": 0.6298,
+                "body": "The third seed finished overnight; variance is smaller than we thought.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.9331,
+                  "app": "in Gmail",
+                  "app_factor": 1.35,
+                  "time": "yesterday ✓"
+                }
+              },
+              {
+                "id": "mem_7d2a8a8fcbe1",
+                "score": 0.6283,
+                "body": "I'll fold the results into the deck before the review.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.9308,
+                  "app": "in Gmail",
+                  "app_factor": 1.35,
+                  "time": "yesterday ✓"
+                }
+              },
+              {
+                "id": "mem_757d2cc181d8",
+                "score": 0.5605,
+                "body": "remember that I want one clear ask per email",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.8304,
+                  "app": "in Gmail",
+                  "app_factor": 1.35,
+                  "time": "yesterday ✓"
+                }
+              },
+              {
+                "id": "mem_e3261ab1ad79",
+                "score": 0.5548,
+                "body": "The third seed finished overnight; variance is smaller than we thought.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.8219,
+                  "app": "in Gmail",
+                  "app_factor": 1.35,
+                  "time": "yesterday ✓"
+                }
+              }
+            ],
+            "below_floor": [
+              {
+                "id": "mem_d3ffe4a23204",
+                "score": 0.07,
+                "body": "I won't be able to attend Friday — I have a family commitmen",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.9327,
+                  "app": "not in gmail",
+                  "app_factor": 0.15,
+                  "time": "yesterday ✓"
+                }
+              },
+              {
+                "id": "mem_2267040fced6",
+                "score": 0.0694,
+                "body": "The auth flow is done. Arjun should review it before standup",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.9256,
+                  "app": "not in gmail",
+                  "app_factor": 0.15,
+                  "time": "yesterday ✓"
+                }
+              },
+              {
+                "id": "mem_6a8d51ebfbde",
+                "score": 0.0693,
+                "body": "The auth flow is done. Rahul should review it before standup",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.924,
+                  "app": "not in gmail",
+                  "app_factor": 0.15,
+                  "time": "yesterday ✓"
+                }
+              },
+              {
+                "id": "mem_7574dd5fca6f",
+                "score": 0.069,
+                "body": "Reviewing the preprint now. Section 4 is the weak part.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.9204,
+                  "app": "not in gmail",
+                  "app_factor": 0.15,
+                  "time": "yesterday ✓"
+                }
+              },
+              {
+                "id": "mem_44cbcf5e98fb",
+                "score": 0.0687,
+                "body": "Duplicate tickets dropped to almost none within a month.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.9156,
+                  "app": "not in gmail",
+                  "app_factor": 0.15,
+                  "time": "yesterday ✓"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "find_impossible",
+      "ask": "find the dictation I did in Figma last Tuesday",
+      "selection": null,
+      "intent": "find_dictation",
+      "confidence": 0.9,
+      "status": "ambiguous",
+      "say": "Two of these match. Which one did you mean?",
+      "checks": {
+        "intent": true,
+        "status": true
+      },
+      "passed": true,
+      "trace_id": "tr_f5a1d516533a",
+      "latency_ms": 8.03,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {},
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "find_dictation",
+            "confidence": 0.9,
+            "margin": 0.699,
+            "scores": {
+              "find_dictation": 0.9,
+              "reshape": 0.1581,
+              "recall": 0.1443,
+              "draft_message": 0.201,
+              "remember": 0.125,
+              "forget": 0.1768
+            },
+            "floor": 0.3
+          }
+        },
+        {
+          "seq": 2,
+          "stage": "parse_reference",
+          "detail": {
+            "time_window": {
+              "start": 1788825600.0,
+              "end": 1788912000.0,
+              "label": "last tuesday",
+              "tolerance_h": 12.0
+            },
+            "app": null
+          }
+        },
+        {
+          "seq": 3,
+          "stage": "retrieve",
+          "detail": {
+            "considered": 490,
+            "floor": 0.12,
+            "filters": {
+              "kinds": [
+                "episode"
+              ],
+              "app": null,
+              "window": {
+                "start": 1788825600.0,
+                "end": 1788912000.0,
+                "label": "last tuesday",
+                "tolerance_h": 12.0
+              },
+              "filter_driven": true
+            },
+            "hits": [
+              {
+                "id": "mem_e3e4219ba5b9",
+                "score": 0.4665,
+                "body": "The third seed finished overnight; variance is smaller than we thought.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.9331,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "last tuesday ✓"
+                }
+              },
+              {
+                "id": "mem_d3ffe4a23204",
+                "score": 0.4664,
+                "body": "I won't be able to attend Friday — I have a family commitment.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.9327,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "last tuesday ✓"
+                }
+              },
+              {
+                "id": "mem_7d2a8a8fcbe1",
+                "score": 0.4654,
+                "body": "I'll fold the results into the deck before the review.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.9308,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "last tuesday ✓"
+                }
+              },
+              {
+                "id": "mem_2267040fced6",
+                "score": 0.4628,
+                "body": "The auth flow is done. Arjun should review it before standup.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.9256,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "last tuesday ✓"
+                }
+              },
+              {
+                "id": "mem_6a8d51ebfbde",
+                "score": 0.462,
+                "body": "The auth flow is done. Rahul should review it before standup.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.924,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "last tuesday ✓"
+                }
+              }
+            ],
+            "below_floor": [
+              {
+                "id": "mem_67d4cac2295f",
+                "score": 0.037,
+                "body": "I rewrote the cutover plan and split it across three people.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.7394,
+                  "app": "no app filter",
+                  "app_factor": 0.1,
+                  "time": "last tuesday ✗"
+                }
+              },
+              {
+                "id": "mem_4cb8b656dad1",
+                "score": 0.0366,
+                "body": "Add a retry on the 401, but keep sessionToken unchanged.",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.733,
+                  "app": "no app filter",
+                  "app_factor": 0.1,
+                  "time": "last tuesday ✗"
+                }
+              },
+              {
+                "id": "mem_19974f5879de",
+                "score": 0.0363,
+                "body": "Reminder: Send the deck at 6",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.7253,
+                  "app": "no app filter",
+                  "app_factor": 0.1,
+                  "time": "last tuesday ✗"
+                }
+              },
+              {
+                "id": "mem_ccc8c30657e1",
+                "score": 0.0363,
+                "body": "remind me to send the deck at 6",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.7253,
+                  "app": "no app filter",
+                  "app_factor": 0.1,
+                  "time": "last tuesday ✗"
+                }
+              },
+              {
+                "id": "mem_04a1cabeffe0",
+                "score": 0.0363,
+                "body": "I won't be able to attend Friday — I have a family commitmen",
+                "why": {
+                  "similarity": 0.5,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.5,
+                  "recency": 0.7256,
+                  "app": "no app filter",
+                  "app_factor": 0.1,
+                  "time": "last tuesday ✗"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "recall_rules",
+      "ask": "what rules are you following for my emails",
+      "selection": null,
+      "intent": "recall",
+      "confidence": 1.0,
+      "status": "answered",
+      "say": "Here is what I am going by.",
+      "checks": {
+        "intent": true,
+        "status": true,
+        "min_active": true
+      },
+      "passed": true,
+      "trace_id": "tr_86a7ca87ca6d",
+      "latency_ms": 0.7,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {
+        "active": [
+          {
+            "id": "mem_85cb89957939",
+            "kind": "preference",
+            "body": "Keep emails to three sentences unless I ask for more",
+            "subject": "keep emails to three sentences unless i ask for more",
+            "status": "active",
+            "payload": {
+              "source_text": "Keep emails to three sentences unless I ask for more",
+              "max_sentences": 3,
+              "applies_to": "Gmail"
+            },
+            "scope_app": "Gmail",
+            "created_ts": 1788551846.0,
+            "source_utt": "utt_0338",
+            "score": 0.252,
+            "why": {
+              "similarity": 0.252,
+              "exact_subject_bonus": 0.0,
+              "filter_driven_baseline": 0.0,
+              "recency": 1.0,
+              "app": "no app filter",
+              "app_factor": 1.0,
+              "time": "no time filter"
+            }
+          },
+          {
+            "id": "mem_8d24a3ffdd16",
+            "kind": "preference",
+            "body": "Bullets over paragraphs for updates",
+            "subject": "bullets over paragraphs for updates",
+            "status": "active",
+            "payload": {
+              "source_text": "Bullets over paragraphs for updates",
+              "bullets": 0
+            },
+            "scope_app": null,
+            "created_ts": 1788446866.0,
+            "source_utt": "utt_0281",
+            "score": 0.169,
+            "why": {
+              "similarity": 0.169,
+              "exact_subject_bonus": 0.0,
+              "filter_driven_baseline": 0.0,
+              "recency": 1.0,
+              "app": "no app filter",
+              "app_factor": 1.0,
+              "time": "no time filter"
+            }
+          },
+          {
+            "id": "mem_efb7479c11ab",
+            "kind": "preference",
+            "body": "I keep emails to three sentences",
+            "subject": "i keep emails to three sentences",
+            "status": "active",
+            "payload": {
+              "source_text": "I keep emails to three sentences",
+              "max_sentences": 3,
+              "applies_to": "Gmail"
+            },
+            "scope_app": null,
+            "created_ts": 1788714757.0,
+            "source_utt": "utt_0409",
+            "score": 0.169,
+            "why": {
+              "similarity": 0.169,
+              "exact_subject_bonus": 0.0,
+              "filter_driven_baseline": 0.0,
+              "recency": 1.0,
+              "app": "no app filter",
+              "app_factor": 1.0,
+              "time": "no time filter"
+            }
+          },
+          {
+            "id": "mem_bec32a6a1ea6",
+            "kind": "preference",
+            "body": "No hedging in my written answers",
+            "subject": "no hedging in my written answers",
+            "status": "active",
+            "payload": {
+              "source_text": "No hedging in my written answers",
+              "no_hedging": true
+            },
+            "scope_app": null,
+            "created_ts": 1788108838.0,
+            "source_utt": "utt_0158",
+            "score": 0.1543,
+            "why": {
+              "similarity": 0.1543,
+              "exact_subject_bonus": 0.0,
+              "filter_driven_baseline": 0.0,
+              "recency": 1.0,
+              "app": "no app filter",
+              "app_factor": 1.0,
+              "time": "no time filter"
+            }
+          },
+          {
+            "id": "mem_74fe1a5c7ee8",
+            "kind": "preference",
+            "body": "Prefer bullets over paragraphs for updates",
+            "subject": "prefer bullets over paragraphs for updates",
+            "status": "active",
+            "payload": {
+              "source_text": "Prefer bullets over paragraphs for updates",
+              "bullets": 0
+            },
+            "scope_app": "Gmail",
+            "created_ts": 1788361232.0,
+            "source_utt": "utt_0253",
+            "score": 0.1543,
+            "why": {
+              "similarity": 0.1543,
+              "exact_subject_bonus": 0.0,
+              "filter_driven_baseline": 0.0,
+              "recency": 1.0,
+              "app": "no app filter",
+              "app_factor": 1.0,
+              "time": "no time filter"
+            }
+          },
+          {
+            "id": "mem_89e801b94329",
+            "kind": "preference",
+            "body": "Always keep my Slack updates to three bullets",
+            "subject": "always keep my slack updates to three bullets",
+            "status": "active",
+            "payload": {
+              "source_text": "Always keep my Slack updates to three bullets",
+              "bullets": 3,
+              "applies_to": "Slack"
+            },
+            "scope_app": null,
+            "created_ts": 1788179632.0,
+            "source_utt": "utt_0183",
+            "score": 0.1336,
+            "why": {
+              "similarity": 0.1336,
+              "exact_subject_bonus": 0.0,
+              "filter_driven_baseline": 0.0,
+              "recency": 1.0,
+              "app": "no app filter",
+              "app_factor": 1.0,
+              "time": "no time filter"
+            }
+          }
+        ],
+        "observed": []
+      },
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "recall",
+            "confidence": 1.0,
+            "margin": 0.5371,
+            "scores": {
+              "find_dictation": 0.1429,
+              "reshape": 0.169,
+              "recall": 1.0,
+              "draft_message": 0.1336,
+              "remember": 0.169,
+              "forget": 0.4629
+            },
+            "floor": 0.3
+          }
+        },
+        {
+          "seq": 2,
+          "stage": "retrieve",
+          "detail": {
+            "considered": 23,
+            "floor": 0.12,
+            "filters": {
+              "kinds": [
+                "fact",
+                "preference"
+              ],
+              "app": null,
+              "window": null,
+              "filter_driven": false
+            },
+            "hits": [
+              {
+                "id": "mem_85cb89957939",
+                "score": 0.252,
+                "body": "Keep emails to three sentences unless I ask for more",
+                "why": {
+                  "similarity": 0.252,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_8d24a3ffdd16",
+                "score": 0.169,
+                "body": "Bullets over paragraphs for updates",
+                "why": {
+                  "similarity": 0.169,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_efb7479c11ab",
+                "score": 0.169,
+                "body": "I keep emails to three sentences",
+                "why": {
+                  "similarity": 0.169,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_bec32a6a1ea6",
+                "score": 0.1543,
+                "body": "No hedging in my written answers",
+                "why": {
+                  "similarity": 0.1543,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_74fe1a5c7ee8",
+                "score": 0.1543,
+                "body": "Prefer bullets over paragraphs for updates",
+                "why": {
+                  "similarity": 0.1543,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_89e801b94329",
+                "score": 0.1336,
+                "body": "Always keep my Slack updates to three bullets",
+                "why": {
+                  "similarity": 0.1336,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              }
+            ],
+            "below_floor": [
+              {
+                "id": "mem_855948b3b3ad",
+                "score": 0.0,
+                "body": "sem → semester",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_03236072cbcd",
+                "score": 0.0,
+                "body": "Sarah's → Saaras",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_fd704e639229",
+                "score": 0.0,
+                "body": "Arjuna → Arjun",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_10c9cea6b0b3",
+                "score": 0.0,
+                "body": "Bulbull → Bulbul",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_8762d7de31a9",
+                "score": 0.0,
+                "body": "ASR → speech recognition",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "recall_spelling",
+      "ask": "how do you spell sharvam",
+      "selection": null,
+      "intent": "recall",
+      "confidence": 0.75,
+      "status": "answered",
+      "say": "Here is what I am going by.",
+      "checks": {
+        "intent": true,
+        "status": true
+      },
+      "passed": true,
+      "trace_id": "tr_97434b9f952e",
+      "latency_ms": 0.49,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {
+        "active": [
+          {
+            "id": "mem_0c3f508a1e6d",
+            "kind": "fact",
+            "body": "Sharvam → Sarvam AI",
+            "subject": "sharvam",
+            "status": "active",
+            "payload": {
+              "wrong": "Sharvam",
+              "right": "Sarvam AI",
+              "flavour": "correction"
+            },
+            "scope_app": null,
+            "created_ts": 1788188250.0,
+            "source_utt": "utt_0190",
+            "score": 0.9837,
+            "why": {
+              "similarity": 0.9837,
+              "exact_subject_bonus": 0.6,
+              "filter_driven_baseline": 0.0,
+              "recency": 1.0,
+              "app": "no app filter",
+              "app_factor": 1.0,
+              "time": "no time filter"
+            }
+          }
+        ],
+        "observed": []
+      },
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "recall",
+            "confidence": 0.75,
+            "margin": 0.75,
+            "scores": {
+              "find_dictation": 0.0,
+              "reshape": 0.0,
+              "recall": 0.75,
+              "draft_message": 0.0,
+              "remember": 0.0,
+              "forget": 0.0
+            },
+            "floor": 0.3
+          }
+        },
+        {
+          "seq": 2,
+          "stage": "retrieve",
+          "detail": {
+            "considered": 23,
+            "floor": 0.12,
+            "filters": {
+              "kinds": [
+                "fact",
+                "preference"
+              ],
+              "app": null,
+              "window": null,
+              "filter_driven": false
+            },
+            "hits": [
+              {
+                "id": "mem_0c3f508a1e6d",
+                "score": 0.9837,
+                "body": "Sharvam → Sarvam AI",
+                "why": {
+                  "similarity": 0.9837,
+                  "exact_subject_bonus": 0.6,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              }
+            ],
+            "below_floor": [
+              {
+                "id": "mem_855948b3b3ad",
+                "score": 0.0,
+                "body": "sem → semester",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_03236072cbcd",
+                "score": 0.0,
+                "body": "Sarah's → Saaras",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_fd704e639229",
+                "score": 0.0,
+                "body": "Arjuna → Arjun",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_10c9cea6b0b3",
+                "score": 0.0,
+                "body": "Bulbull → Bulbul",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_8762d7de31a9",
+                "score": 0.0,
+                "body": "ASR → speech recognition",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "remember_new",
+      "ask": "remember that I always sign off with just my first name",
+      "selection": null,
+      "intent": "remember",
+      "confidence": 0.88,
+      "status": "remembered",
+      "say": "Kept: I always sign off with just my first name",
+      "checks": {
+        "intent": true,
+        "status": true
+      },
+      "passed": true,
+      "trace_id": "tr_1bb28d2ea997",
+      "latency_ms": 0.54,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {
+        "memory": {
+          "outcome": "created",
+          "id": "mem_96f004d3a2b2",
+          "kind": "preference",
+          "body": "I always sign off with just my first name",
+          "status": "active",
+          "reason": "you told Kivi directly",
+          "needs": null
+        }
+      },
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "remember",
+            "confidence": 0.88,
+            "margin": 0.6875,
+            "scores": {
+              "find_dictation": 0.0,
+              "reshape": 0.0,
+              "recall": 0.1361,
+              "draft_message": 0.0,
+              "remember": 0.88,
+              "forget": 0.1925
+            },
+            "floor": 0.3
+          }
+        },
+        {
+          "seq": 2,
+          "stage": "teach",
+          "detail": {
+            "outcome": "created",
+            "id": "mem_96f004d3a2b2",
+            "kind": "preference",
+            "body": "I always sign off with just my first name",
+            "status": "active",
+            "reason": "you told Kivi directly",
+            "needs": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "remember_refused",
+      "ask": "remember that my portal password is kivi@2026",
+      "selection": null,
+      "intent": "remember",
+      "confidence": 0.88,
+      "status": "declined",
+      "say": "I will not keep that. It looks like credential, which Kivi never stores.",
+      "checks": {
+        "intent": true,
+        "status": true
+      },
+      "passed": true,
+      "trace_id": "tr_3cebf9e32bb3",
+      "latency_ms": 0.19,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {},
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "remember",
+            "confidence": 0.88,
+            "margin": 0.5264,
+            "scores": {
+              "find_dictation": 0.0,
+              "reshape": 0.0,
+              "recall": 0.1443,
+              "draft_message": 0.0,
+              "remember": 0.88,
+              "forget": 0.3536
+            },
+            "floor": 0.3
+          }
+        },
+        {
+          "seq": 2,
+          "stage": "refused",
+          "detail": {
+            "category": "credential"
+          }
+        }
+      ]
+    },
+    {
+      "id": "forget_rule",
+      "ask": "forget the rule about Dear Sir",
+      "selection": null,
+      "intent": "forget",
+      "confidence": 0.92,
+      "status": "ambiguous",
+      "say": "Which one should I drop?",
+      "checks": {
+        "intent": true,
+        "status": true
+      },
+      "passed": true,
+      "trace_id": "tr_4d5e6612cec4",
+      "latency_ms": 0.54,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {
+        "options": [
+          {
+            "id": "mem_6befaf4beb73",
+            "kind": "preference",
+            "body": "Never open with Dear Sir/Madam",
+            "subject": "never open with dear sir madam",
+            "status": "active",
+            "payload": {
+              "source_text": "Never open with Dear Sir/Madam",
+              "no_formal_greeting": true
+            },
+            "scope_app": "Gmail",
+            "created_ts": 1788289980.0,
+            "source_utt": "utt_0234",
+            "score": 0.3333,
+            "why": {
+              "similarity": 0.3333,
+              "exact_subject_bonus": 0.0,
+              "filter_driven_baseline": 0.0,
+              "recency": 1.0,
+              "app": "no app filter",
+              "app_factor": 1.0,
+              "time": "no time filter"
+            }
+          },
+          {
+            "id": "mem_fe1ea8b1fa30",
+            "kind": "preference",
+            "body": "Never write Dear Sir or Madam",
+            "subject": "never write dear sir or madam",
+            "status": "active",
+            "payload": {
+              "source_text": "Never write Dear Sir or Madam",
+              "no_formal_greeting": true
+            },
+            "scope_app": null,
+            "created_ts": 1788536113.0,
+            "source_utt": "utt_0320",
+            "score": 0.3333,
+            "why": {
+              "similarity": 0.3333,
+              "exact_subject_bonus": 0.0,
+              "filter_driven_baseline": 0.0,
+              "recency": 1.0,
+              "app": "no app filter",
+              "app_factor": 1.0,
+              "time": "no time filter"
+            }
+          },
+          {
+            "id": "mem_ec833d181c6d",
+            "kind": "preference",
+            "body": "Formal wording when I write to the professor",
+            "subject": "formal wording when i write to the professor",
+            "status": "active",
+            "payload": {
+              "source_text": "Formal wording when I write to the professor",
+              "register": "formal"
+            },
+            "scope_app": null,
+            "created_ts": 1788538230.0,
+            "source_utt": "utt_0325",
+            "score": 0.1543,
+            "why": {
+              "similarity": 0.1543,
+              "exact_subject_bonus": 0.0,
+              "filter_driven_baseline": 0.0,
+              "recency": 1.0,
+              "app": "no app filter",
+              "app_factor": 1.0,
+              "time": "no time filter"
+            }
+          }
+        ]
+      },
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "forget",
+            "confidence": 0.92,
+            "margin": 0.5867,
+            "scores": {
+              "find_dictation": 0.2722,
+              "reshape": 0.1826,
+              "recall": 0.2041,
+              "draft_message": 0.3333,
+              "remember": 0.3333,
+              "forget": 0.92
+            },
+            "floor": 0.3
+          }
+        },
+        {
+          "seq": 2,
+          "stage": "retrieve",
+          "detail": {
+            "considered": 24,
+            "floor": 0.12,
+            "filters": {
+              "kinds": [
+                "fact",
+                "preference"
+              ],
+              "app": null,
+              "window": null,
+              "filter_driven": false
+            },
+            "hits": [
+              {
+                "id": "mem_6befaf4beb73",
+                "score": 0.3333,
+                "body": "Never open with Dear Sir/Madam",
+                "why": {
+                  "similarity": 0.3333,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_fe1ea8b1fa30",
+                "score": 0.3333,
+                "body": "Never write Dear Sir or Madam",
+                "why": {
+                  "similarity": 0.3333,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_ec833d181c6d",
+                "score": 0.1543,
+                "body": "Formal wording when I write to the professor",
+                "why": {
+                  "similarity": 0.1543,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              }
+            ],
+            "below_floor": [
+              {
+                "id": "mem_855948b3b3ad",
+                "score": 0.0,
+                "body": "sem → semester",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_03236072cbcd",
+                "score": 0.0,
+                "body": "Sarah's → Saaras",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_fd704e639229",
+                "score": 0.0,
+                "body": "Arjuna → Arjun",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_10c9cea6b0b3",
+                "score": 0.0,
+                "body": "Bulbull → Bulbul",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              },
+              {
+                "id": "mem_8762d7de31a9",
+                "score": 0.0,
+                "body": "ASR → speech recognition",
+                "why": {
+                  "similarity": 0.0,
+                  "exact_subject_bonus": 0.0,
+                  "filter_driven_baseline": 0.0,
+                  "recency": 1.0,
+                  "app": "no app filter",
+                  "app_factor": 1.0,
+                  "time": "no time filter"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "reshape_with_selection",
+      "ask": "make this more concise but keep the technical meaning",
+      "selection": "The implementation requires significant engineering effort and may not be practical within the current timeline, so we have decided to report both the full system and a reduced variant instead.",
+      "intent": "reshape",
+      "confidence": 0.9428,
+      "status": "drafted",
+      "say": null,
+      "checks": {
+        "intent": true,
+        "status": true,
+        "changed": true
+      },
+      "passed": true,
+      "trace_id": "tr_b6256c1e6bcf",
+      "latency_ms": 0.96,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {
+        "after": "• The implementation is costly and may not fit the current timeline; we report both the full system and a reduced variant instead",
+        "applied": [
+          "1 bullet",
+          "tightened wording"
+        ]
+      },
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "reshape",
+            "confidence": 0.9428,
+            "margin": 0.7533,
+            "scores": {
+              "find_dictation": 0.126,
+              "reshape": 0.9428,
+              "recall": 0.0,
+              "draft_message": 0.1895,
+              "remember": 0.126,
+              "forget": 0.1667
+            },
+            "floor": 0.3
+          }
+        },
+        {
+          "seq": 2,
+          "stage": "rules_in_force",
+          "detail": {
+            "count": 14,
+            "rules": [
+              {
+                "id": "mem_96f004d3a2b2",
+                "body": "I always sign off with just my first name"
+              },
+              {
+                "id": "mem_9a77df903d0d",
+                "body": "To explain method sections in Tamil"
+              },
+              {
+                "id": "mem_c9febdce6e57",
+                "body": "I want one clear ask per email"
+              },
+              {
+                "id": "mem_85cb89957939",
+                "body": "Keep emails to three sentences unless I ask for more"
+              },
+              {
+                "id": "mem_577eb6a0f1ae",
+                "body": "Never stack apologies in a message"
+              },
+              {
+                "id": "mem_ef2fa25cf6ab",
+                "body": "Always put the number first in a status update"
+              },
+              {
+                "id": "mem_efb7479c11ab",
+                "body": "I keep emails to three sentences"
+              },
+              {
+                "id": "mem_6befaf4beb73",
+                "body": "Never open with Dear Sir/Madam"
+              },
+              {
+                "id": "mem_74fe1a5c7ee8",
+                "body": "Prefer bullets over paragraphs for updates"
+              },
+              {
+                "id": "mem_ec833d181c6d",
+                "body": "Formal wording when I write to the professor"
+              },
+              {
+                "id": "mem_fe1ea8b1fa30",
+                "body": "Never write Dear Sir or Madam"
+              },
+              {
+                "id": "mem_8d24a3ffdd16",
+                "body": "Bullets over paragraphs for updates"
+              },
+              {
+                "id": "mem_89e801b94329",
+                "body": "Always keep my Slack updates to three bullets"
+              },
+              {
+                "id": "mem_bec32a6a1ea6",
+                "body": "No hedging in my written answers"
+              }
+            ]
+          }
+        },
+        {
+          "seq": 3,
+          "stage": "reshape",
+          "detail": {
+            "instruction": "make this more concise but keep the technical meaning",
+            "applied": [
+              "1 bullet",
+              "tightened wording"
+            ],
+            "applied_memory_ids": [],
+            "unused_rules": [
+              "I always sign off with just my first name",
+              "To explain method sections in Tamil",
+              "I want one clear ask per email",
+              "Keep emails to three sentences unless I ask for more",
+              "Never stack apologies in a message",
+              "Always put the number first in a status update",
+              "I keep emails to three sentences",
+              "Never open with Dear Sir/Madam",
+              "Prefer bullets over paragraphs for updates",
+              "Formal wording when I write to the professor",
+              "Never write Dear Sir or Madam",
+              "Bullets over paragraphs for updates",
+              "Always keep my Slack updates to three bullets",
+              "No hedging in my written answers"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "reshape_without_selection",
+      "ask": "make this shorter",
+      "selection": null,
+      "intent": "reshape",
+      "confidence": 1.0,
+      "status": "ambiguous",
+      "say": "Select the text you want changed first.",
+      "checks": {
+        "intent": true,
+        "status": true,
+        "field": true
+      },
+      "passed": true,
+      "trace_id": "tr_7e1d8daf8573",
+      "latency_ms": 0.14,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {
+        "options": []
+      },
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "reshape",
+            "confidence": 1.0,
+            "margin": 0.7818,
+            "scores": {
+              "find_dictation": 0.2182,
+              "reshape": 1.0,
+              "recall": 0.0,
+              "draft_message": 0.0,
+              "remember": 0.0,
+              "forget": 0.0
+            },
+            "floor": 0.3
+          }
+        },
+        {
+          "seq": 2,
+          "stage": "missing_input",
+          "detail": {
+            "needs": "selection"
+          }
+        }
+      ]
+    },
+    {
+      "id": "draft_named",
+      "ask": "draft a message to Arjun saying the latency numbers are ready",
+      "selection": null,
+      "intent": "draft_message",
+      "confidence": 0.8,
+      "status": "drafted",
+      "say": null,
+      "checks": {
+        "intent": true,
+        "status": true,
+        "not_sent": true
+      },
+      "passed": true,
+      "trace_id": "tr_def4f1b4c08b",
+      "latency_ms": 0.75,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {
+        "draft": "• the latency numbers are ready",
+        "applied": [
+          "1 bullet"
+        ]
+      },
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "draft_message",
+            "confidence": 0.8,
+            "margin": 0.4838,
+            "scores": {
+              "find_dictation": 0.3162,
+              "reshape": 0.1414,
+              "recall": 0.1581,
+              "draft_message": 0.8,
+              "remember": 0.1195,
+              "forget": 0.1581
+            },
+            "floor": 0.3
+          }
+        },
+        {
+          "seq": 2,
+          "stage": "rules_in_force",
+          "detail": {
+            "count": 14,
+            "rules": [
+              {
+                "id": "mem_96f004d3a2b2",
+                "body": "I always sign off with just my first name"
+              },
+              {
+                "id": "mem_9a77df903d0d",
+                "body": "To explain method sections in Tamil"
+              },
+              {
+                "id": "mem_c9febdce6e57",
+                "body": "I want one clear ask per email"
+              },
+              {
+                "id": "mem_85cb89957939",
+                "body": "Keep emails to three sentences unless I ask for more"
+              },
+              {
+                "id": "mem_577eb6a0f1ae",
+                "body": "Never stack apologies in a message"
+              },
+              {
+                "id": "mem_ef2fa25cf6ab",
+                "body": "Always put the number first in a status update"
+              },
+              {
+                "id": "mem_efb7479c11ab",
+                "body": "I keep emails to three sentences"
+              },
+              {
+                "id": "mem_6befaf4beb73",
+                "body": "Never open with Dear Sir/Madam"
+              },
+              {
+                "id": "mem_74fe1a5c7ee8",
+                "body": "Prefer bullets over paragraphs for updates"
+              },
+              {
+                "id": "mem_ec833d181c6d",
+                "body": "Formal wording when I write to the professor"
+              },
+              {
+                "id": "mem_fe1ea8b1fa30",
+                "body": "Never write Dear Sir or Madam"
+              },
+              {
+                "id": "mem_8d24a3ffdd16",
+                "body": "Bullets over paragraphs for updates"
+              },
+              {
+                "id": "mem_89e801b94329",
+                "body": "Always keep my Slack updates to three bullets"
+              },
+              {
+                "id": "mem_bec32a6a1ea6",
+                "body": "No hedging in my written answers"
+              }
+            ]
+          }
+        },
+        {
+          "seq": 3,
+          "stage": "draft",
+          "detail": {
+            "recipient": "Arjun",
+            "applied": [
+              "1 bullet"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "ambiguous_referent",
+      "ask": "send this to him",
+      "selection": null,
+      "intent": "draft_message",
+      "confidence": 0.8,
+      "status": "ambiguous",
+      "say": "Two people could be that here, and nothing is selected.",
+      "checks": {
+        "status": true
+      },
+      "passed": true,
+      "trace_id": "tr_6d79dbed9ca8",
+      "latency_ms": 0.26,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {
+        "options": [
+          "Arjun",
+          "Bulbul",
+          "Kaavya"
+        ]
+      },
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "draft_message",
+            "confidence": 0.8,
+            "margin": 0.3918,
+            "scores": {
+              "find_dictation": 0.189,
+              "reshape": 0.4082,
+              "recall": 0.0,
+              "draft_message": 0.8,
+              "remember": 0.189,
+              "forget": 0.0
+            },
+            "floor": 0.3
+          }
+        },
+        {
+          "seq": 2,
+          "stage": "ambiguous_referent",
+          "detail": {
+            "candidates": [
+              "Arjun",
+              "Bulbul",
+              "Kaavya"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "nonsense",
+      "ask": "purple monday sideways",
+      "selection": null,
+      "intent": null,
+      "confidence": null,
+      "status": "unclear",
+      "say": "I am not sure what you want done with that.",
+      "checks": {
+        "status": true
+      },
+      "passed": true,
+      "trace_id": "tr_d980a4e4e49b",
+      "latency_ms": 0.19,
+      "usage": {
+        "calls": 0,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cost_usd": 0.0,
+        "backend": "local"
+      },
+      "result": {
+        "options": [
+          "find something you dictated",
+          "rewrite what is selected"
+        ],
+        "reason": "confidence 0.00 against a floor of 0.3"
+      },
+      "trace_steps": [
+        {
+          "seq": 0,
+          "stage": "memory_scope",
+          "detail": {
+            "reads": [
+              "fact",
+              "preference",
+              "episode"
+            ],
+            "reason": "an interactive request may use everything Kivi knows"
+          }
+        },
+        {
+          "seq": 1,
+          "stage": "route",
+          "detail": {
+            "intent": "find_dictation",
+            "confidence": 0.0,
+            "margin": 0.0,
+            "scores": {
+              "find_dictation": 0.0,
+              "reshape": 0.0,
+              "recall": 0.0,
+              "draft_message": 0.0,
+              "remember": 0.0,
+              "forget": 0.0
+            },
+            "floor": 0.3
+          }
+        }
+      ]
+    }
+  ]
+}

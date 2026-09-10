@@ -27,209 +27,119 @@ _TEACH = re.compile(
     r"(?:means|should mean|means that|=)\s+(?P<meaning>.{6,300})$", re.I)
 
 
-def _id() -> str:
-    return f"mem_{uuid.uuid4().hex[:12]}"
-
+def _id() -> str: return f"mem_{uuid.uuid4().hex[:12]}"
 
 def phrase_similarity(a: str, b: str) -> float:
     return SequenceMatcher(None, (a or "").strip().lower(), (b or "").strip().lower()).ratio()
 
-
 def parse_teaching(text: str) -> dict[str, str] | None:
     m = _TEACH.search(text or "")
-    if not m:
-        return None
+    if not m: return None
     phrase = m.group("phrase").strip().strip("\"'“”")
     meaning = m.group("meaning").strip().rstrip(".")
-    if len(phrase.split()) > 5 or not meaning:
-        return None
+    if len(phrase.split()) > 5 or not meaning: return None
     return {"phrase": phrase, "meaning": meaning}
-
 
 def _split_clauses(meaning: str) -> list[str]:
     parts = re.split(r"\s*[,;. ]\s*", meaning)
-    out = []
+    out=[]
     for p in parts:
-        p = p.strip(" .,;")
-        if len(p.split()) >= 2:
-            out.append(p[:1].upper() + p[1:])
+        p=p.strip(" .,;")
+        if len(p.split()) >= 2: out.append(p[:1].upper()+p[1:])
     return out or [meaning.strip()]
 
-_RULE_WORDS = {
-    "max_sentences": ("sentence",), "bullets": ("bullet",), "no_apology": ("apolog",),
-    "no_formal_greeting": ("dear sir", "madam"), "no_hedging": ("hedg", "adjective", "fluff", "filler"),
-    "register": ("formal", "casual", "warm", "friendly"), "single_ask": ("ask",),
-    "language": ("tamil", "hindi", "telugu", "english", "kannada"),
-}
-
+_RULE_WORDS={"max_sentences":("sentence",),"bullets":("bullet",),"no_apology":("apolog",),"no_formal_greeting":("dear sir","madam"),"no_hedging":("hedg","adjective","fluff","filler"),"register":("formal","casual","warm","friendly"),"single_ask":("ask",),"language":("tamil","hindi","telugu","english","kannada")}
 
 def _line_is_structured(line: str, rules: dict[str, Any]) -> bool:
-    low = line.lower()
-    return any(key in rules and any(w in low for w in words) for key, words in _RULE_WORDS.items())
+    low=line.lower(); return any(k in rules and any(w in low for w in ws) for k,ws in _RULE_WORDS.items())
 
+def interpret(phrase: str, meaning: str, apps: list[str] | None=None, fires_on: str="selection", examples: list[str] | None=None) -> dict[str,Any]:
+    lines=_split_clauses(meaning); rules=_compile_rule(meaning)
+    understood=[{"n":i+1,"text":line,"structured":_line_is_structured(line,rules)} for i,line in enumerate(lines)]
+    return {"phrase":phrase,"trigger":normalise_key(phrase),"meaning":meaning,"understood":understood,"rules":rules,"apps":apps or [],"fires_on":fires_on if fires_on in FIRES_ON else "selection","examples":examples or [],"not_executable":[u["text"] for u in understood if not u["structured"]],"status":"draft"}
 
-def interpret(phrase: str, meaning: str, apps: list[str] | None = None,
-              fires_on: str = "selection", examples: list[str] | None = None) -> dict[str, Any]:
-    lines = _split_clauses(meaning)
-    rules = _compile_rule(meaning)
-    understood = [{"n": i + 1, "text": line, "structured": _line_is_structured(line, rules)}
-                  for i, line in enumerate(lines)]
-    return {
-        "phrase": phrase, "trigger": normalise_key(phrase), "meaning": meaning,
-        "understood": understood, "rules": rules, "apps": apps or [],
-        "fires_on": fires_on if fires_on in FIRES_ON else "selection",
-        "examples": examples or [],
-        "not_executable": [u["text"] for u in understood if not u["structured"]],
-        "status": "draft",
-    }
-
-
-def _all(conn: sqlite3.Connection) -> list[dict[str, Any]]:
-    rows = conn.execute("SELECT * FROM memory WHERE kind='shortcut' AND status='active' ORDER BY use_count DESC").fetchall()
-    out = []
+def _all(conn: sqlite3.Connection)->list[dict[str,Any]]:
+    rows=conn.execute("SELECT * FROM memory WHERE kind='shortcut' AND status='active' ORDER BY use_count DESC").fetchall(); out=[]
     for r in rows:
-        p = jload(r["payload"])
-        out.append({"id": r["id"], "trigger": r["subject"], "phrase": p.get("phrase", r["subject"]),
-                    "body": r["body"], "rules": p.get("rules", {}), "apps": p.get("apps", []),
-                    "fires_on": p.get("fires_on", "selection"), "understood": p.get("understood", []),
-                    "not_executable": p.get("not_executable", []), "use_count": r["use_count"],
-                    "created_ts": r["created_ts"], "source_utt": r["source_utt"]})
+        p=jload(r["payload"]); out.append({"id":r["id"],"trigger":r["subject"],"phrase":p.get("phrase",r["subject"]),"body":r["body"],"rules":p.get("rules",{}),"apps":p.get("apps",[]),"fires_on":p.get("fires_on","selection"),"understood":p.get("understood",[]),"not_executable":p.get("not_executable",[]),"use_count":r["use_count"],"created_ts":r["created_ts"],"source_utt":r["source_utt"]})
     return out
 
-
-def _nearest(conn: sqlite3.Connection, trigger: str, exclude: str | None) -> dict | None:
-    best = None
+def _nearest(conn,trigger,exclude):
+    best=None
     for s in _all(conn):
-        if s["id"] == exclude: continue
-        score = phrase_similarity(trigger, s["trigger"])
-        if best is None or score > best["score"]: best = {**s, "score": score}
+        if s["id"]==exclude: continue
+        score=phrase_similarity(trigger,s["trigger"])
+        if best is None or score>best["score"]: best={**s,"score":score}
     return best
 
-
-def save(conn: sqlite3.Connection, draft: dict[str, Any], utt_id: str | None = None) -> dict[str, Any]:
-    trigger = draft.get("trigger") or normalise_key(draft.get("phrase", ""))
-    if not trigger: return {"error": "no trigger phrase"}
-    existing = conn.execute("SELECT * FROM memory WHERE kind='shortcut' AND subject=? AND status='active'", (trigger,)).fetchone()
-    if existing:
-        return {"status": "exists", "id": existing["id"], "body": existing["body"],
-                "say": f"“{draft['phrase']}” already means something. Edit it or pick another phrase."}
-    near = _nearest(conn, trigger, None)
-    mid = _id()
-    payload = {"trigger": trigger, "phrase": draft["phrase"], "meaning": draft["meaning"],
-               "understood": [u["text"] for u in draft.get("understood", [])],
-               "rules": draft.get("rules", {}), "apps": draft.get("apps", []),
-               "fires_on": draft.get("fires_on", "selection"), "examples": draft.get("examples", []),
-               "not_executable": draft.get("not_executable", [])}
-    t = now()
-    conn.execute("""INSERT INTO memory
-        (id, kind, subject, body, payload, status, confidence, observations, scope_app,
-         created_ts, updated_ts, source_utt, origin, reason)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-        (mid, "shortcut", trigger, draft["meaning"], jdump(payload), "active", 0.97, 1,
-         (draft.get("apps") or [None])[0], t, t, utt_id, "taught", "you defined this phrase yourself"))
-    conn.execute("INSERT INTO memory_event (memory_id, ts, event, detail, utt_id) VALUES (?,?,?,?,?)",
-                 (mid, t, "promoted", "taught and confirmed", utt_id))
-    conn.commit()
-    out = {"status": "saved", "id": mid, "phrase": draft["phrase"], "trigger": trigger,
-           "fires_on": payload["fires_on"], "apps": payload["apps"]}
-    if near and near["score"] >= 1 - COLLISION_MARGIN * 2:
-        out["warning"] = {"against": near["body"], "against_id": near["id"], "score": near["score"],
-                           "say": f"“{draft['phrase']}” sounds close to “{near['phrase']}”. Kivi may confuse them — consider renaming one."}
+def save(conn: sqlite3.Connection,draft:dict[str,Any],utt_id:str|None=None)->dict[str,Any]:
+    trigger=draft.get("trigger") or normalise_key(draft.get("phrase",""))
+    if not trigger:return {"error":"no trigger phrase"}
+    existing=conn.execute("SELECT * FROM memory WHERE kind='shortcut' AND subject=? AND status='active'",(trigger,)).fetchone()
+    if existing:return {"status":"exists","id":existing["id"],"body":existing["body"],"say":f"“{draft['phrase']}” already means something. Edit it or pick another phrase."}
+    near=_nearest(conn,trigger,None); mid=_id(); payload={"trigger":trigger,"phrase":draft["phrase"],"meaning":draft["meaning"],"understood":[u["text"] for u in draft.get("understood",[])],"rules":draft.get("rules",{}),"apps":draft.get("apps",[]),"fires_on":draft.get("fires_on","selection"),"examples":draft.get("examples",[]),"not_executable":draft.get("not_executable",[])}; t=now()
+    conn.execute("""INSERT INTO memory (id,kind,subject,body,payload,status,confidence,observations,scope_app,created_ts,updated_ts,source_utt,origin,reason) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",(mid,"shortcut",trigger,draft["meaning"],jdump(payload),"active",0.97,1,(draft.get("apps") or [None])[0],t,t,utt_id,"taught","you defined this phrase yourself"))
+    conn.execute("INSERT INTO memory_event (memory_id,ts,event,detail,utt_id) VALUES (?,?,?,?,?)",(mid,t,"promoted","taught and confirmed",utt_id)); conn.commit()
+    out={"status":"saved","id":mid,"phrase":draft["phrase"],"trigger":trigger,"fires_on":payload["fires_on"],"apps":payload["apps"]}
+    if near and near["score"] >= 1-COLLISION_MARGIN*2: out["warning"]={"against":near["body"],"against_id":near["id"],"score":near["score"],"say":f"“{draft['phrase']}” sounds close to “{near['phrase']}”. Kivi may confuse them — consider renaming one."}
     return out
 
+def _head_similarity(said,trigger):
+    heads=[t for t in content_tokens(trigger) if t not in DEICTIC] or content_tokens(trigger); toks=content_tokens(said) or [said]; grams=list(toks)+[f"{toks[i]} {toks[i+1]}" for i in range(len(toks)-1)]+[f"{toks[i]}-{toks[i+1]}" for i in range(len(toks)-1)]
+    return max((phrase_similarity(h,g) for h in heads for g in grams),default=0.0)
 
-def _head_similarity(said: str, trigger: str) -> float:
-    heads = [t for t in content_tokens(trigger) if t not in DEICTIC] or content_tokens(trigger)
-    toks = content_tokens(said) or [said]
-    grams = list(toks) + [f"{toks[i]} {toks[i+1]}" for i in range(len(toks)-1)]
-    grams += [f"{toks[i]}-{toks[i+1]}" for i in range(len(toks)-1)]
-    return max((phrase_similarity(h, g) for h in heads for g in grams), default=0.0)
+def _window_similarity(said,trigger): return phrase_similarity(said,trigger)
 
-
-def _window_similarity(said: str, trigger: str) -> float:
-    return phrase_similarity(said, trigger)
-
-
-def match(conn: sqlite3.Connection, said: str, app: str | None, has_selection: bool, trace=None) -> dict[str, Any] | None:
-    shortcuts = _all(conn)
-    if not shortcuts: return None
-    key = normalise_key(said)
-    scored = []
+def match(conn,said,app,has_selection,trace=None):
+    shortcuts=_all(conn)
+    if not shortcuts:return None
+    key=normalise_key(said); scored=[]
     for s in shortcuts:
-        trig = s["trigger"]
-        verbatim = trig in key
-        if verbatim: score = 1.0
+        trig=s["trigger"]; verbatim=trig in key
+        if verbatim: score=1.0
         else:
-            head = _head_similarity(said, trig)
-            score = max(head, _window_similarity(key, trig)) if head >= TRIGGER_FLOOR else head
-        scored.append({**s, "score": round(score, 4), "verbatim": verbatim})
-    scored.sort(key=lambda x: x["score"], reverse=True)
-    top = scored[0]
-    runner = scored[1] if len(scored) > 1 else None
-    if trace:
-        trace.step("shortcut_lookup", floor=TRIGGER_FLOOR,
-                   candidates=[{"phrase": s["phrase"], "score": s["score"], "verbatim": s["verbatim"]} for s in scored[:4]])
-    if top["score"] < TRIGGER_FLOOR: return None
-    near = runner and runner["score"] >= TRIGGER_FLOOR and (top["score"] - runner["score"]) < COLLISION_MARGIN
+            head=_head_similarity(said,trig); score=max(head,_window_similarity(key,trig)) if head>=TRIGGER_FLOOR else head
+        scored.append({**s,"score":round(score,4),"verbatim":verbatim})
+    scored.sort(key=lambda x:x["score"],reverse=True); top=scored[0]; runner=scored[1] if len(scored)>1 else None
+    if trace:trace.step("shortcut_lookup",floor=TRIGGER_FLOOR,candidates=[{"phrase":s["phrase"],"score":s["score"],"verbatim":s["verbatim"]} for s in scored[:4]])
+    if top["score"]<TRIGGER_FLOOR:return None
+    near=runner and runner["score"]>=TRIGGER_FLOOR and (top["score"]-runner["score"])<COLLISION_MARGIN
     if near:
-        _record_collision(conn, said, top["id"], runner["id"], top["score"] - runner["score"])
-        if trace: trace.step("shortcut_near_miss", between=[top["phrase"], runner["phrase"]], margin=round(top["score"]-runner["score"],4), top_verbatim=top["verbatim"])
-        if not (top["verbatim"] and not runner["verbatim"]):
-            return {"status": "ambiguous_trigger", "say": f"“{top['phrase']}” and “{runner['phrase']}” sound alike. Which did you mean?",
-                    "options": [top["phrase"], runner["phrase"]], "field": "shortcut", "candidates": [top, runner]}
+        _record_collision(conn,said,top["id"],runner["id"],top["score"]-runner["score"])
+        if trace:trace.step("shortcut_near_miss",between=[top["phrase"],runner["phrase"]],margin=round(top["score"]-runner["score"],4),top_verbatim=top["verbatim"])
+        if not(top["verbatim"] and not runner["verbatim"]):return {"status":"ambiguous_trigger","say":f"“{top['phrase']}” and “{runner['phrase']}” sound alike. Which did you mean?","options":[top["phrase"],runner["phrase"]],"field":"shortcut","candidates":[top,runner]}
     if top["apps"] and app and app not in top["apps"]:
-        if trace: trace.step("shortcut_out_of_scope", phrase=top["phrase"], allowed=top["apps"], here=app)
-        return {"status": "out_of_scope", "say": f"“{top['phrase']}” is set up for {', '.join(top['apps'])}, not {app}.",
-                "options": ["use it here anyway", "leave it alone"], "shortcut": top}
-    if top["fires_on"] == "selection" and not has_selection:
-        if trace: trace.step("shortcut_needs_selection", phrase=top["phrase"])
-        return {"status": "needs_selection", "say": f"Select the text you want “{top['phrase']}” applied to.",
-                "field": "selection", "shortcut": top}
-    if trace:
-        trace.step("shortcut_matched", phrase=top["phrase"], score=top["score"],
-                   verbatim=top["verbatim"], applies=top["understood"], not_executable=top["not_executable"])
-    out = {"status": "matched", "shortcut": top, "score": top["score"]}
-    if near: out["near_miss"] = {"against": runner["phrase"], "against_id": runner["id"], "margin": round(top["score"]-runner["score"],4)}
+        if trace:trace.step("shortcut_out_of_scope",phrase=top["phrase"],allowed=top["apps"],here=app)
+        return {"status":"out_of_scope","say":f"“{top['phrase']}” is set up for {', '.join(top['apps'])}, not {app}.","options":["use it here anyway","leave it alone"],"shortcut":top}
+    if top["fires_on"]=="selection" and not has_selection:
+        if trace:trace.step("shortcut_needs_selection",phrase=top["phrase"])
+        return {"status":"needs_selection","say":f"Select the text you want “{top['phrase']}” applied to.","field":"selection","shortcut":top}
+    if trace:trace.step("shortcut_matched",phrase=top["phrase"],score=top["score"],verbatim=top["verbatim"],applies=top["understood"],not_executable=top["not_executable"])
+    out={"status":"matched","shortcut":top,"score":top["score"]}
+    if near:out["near_miss"]={"against":runner["phrase"],"against_id":runner["id"],"margin":round(top["score"]-runner["score"],4)}
     return out
 
+def _record_collision(conn,said,chosen,against,margin):
+    conn.execute("INSERT INTO shortcut_collision (ts,said,chosen,against,margin) VALUES (?,?,?,?,?)",(now(),said,chosen,against,round(margin,4)));conn.commit()
 
-def _record_collision(conn, said: str, chosen: str, against: str, margin: float) -> None:
-    conn.execute("INSERT INTO shortcut_collision (ts, said, chosen, against, margin) VALUES (?,?,?,?,?)",
-                 (now(), said, chosen, against, round(margin,4)))
-    conn.commit()
+def collisions(conn):
+    rows=conn.execute("""SELECT c.*,a.body AS chosen_body,b.body AS against_body FROM shortcut_collision c LEFT JOIN memory a ON a.id=c.chosen LEFT JOIN memory b ON b.id=c.against WHERE c.resolved=0 ORDER BY c.ts DESC LIMIT 10""").fetchall()
+    return [{"id":r["id"],"said":r["said"],"margin":r["margin"],"chosen":r["chosen"],"against":r["against"],"chosen_body":r["chosen_body"],"against_body":r["against_body"]} for r in rows]
 
+def collision_counts(conn):
+    rows=conn.execute("SELECT chosen,COUNT(*) n FROM shortcut_collision WHERE resolved=0 GROUP BY chosen").fetchall();return {r["chosen"]:r["n"] for r in rows}
 
-def collisions(conn: sqlite3.Connection) -> list[dict[str, Any]]:
-    rows = conn.execute("""SELECT c.*, a.body AS chosen_body, b.body AS against_body
-        FROM shortcut_collision c LEFT JOIN memory a ON a.id=c.chosen LEFT JOIN memory b ON b.id=c.against
-        WHERE c.resolved=0 ORDER BY c.ts DESC LIMIT 10""").fetchall()
-    return [{"id":r["id"],"said":r["said"],"margin":r["margin"],"chosen":r["chosen"],"against":r["against"],
-             "chosen_body":r["chosen_body"],"against_body":r["against_body"]} for r in rows]
-
-
-def collision_counts(conn: sqlite3.Connection) -> dict[str,int]:
-    rows=conn.execute("SELECT chosen, COUNT(*) n FROM shortcut_collision WHERE resolved=0 GROUP BY chosen").fetchall()
-    return {r["chosen"]:r["n"] for r in rows}
-
-
-def rename(conn: sqlite3.Connection, memory_id: str, phrase: str) -> dict[str, Any]:
+def rename(conn,memory_id,phrase):
     row=conn.execute("SELECT * FROM memory WHERE id=?",(memory_id,)).fetchone()
-    if not row: return {"error":"no such shortcut"}
-    payload=jload(row["payload"]); payload["phrase"]=phrase; payload["trigger"]=normalise_key(phrase)
-    conn.execute("UPDATE memory SET subject=?, payload=?, updated_ts=? WHERE id=?",(payload["trigger"],jdump(payload),now(),memory_id))
-    conn.execute("UPDATE shortcut_collision SET resolved=1 WHERE chosen=? OR against=?",(memory_id,memory_id))
-    conn.execute("INSERT INTO memory_event (memory_id, ts, event, detail) VALUES (?,?,?,?)",(memory_id,now(),"edited",f"renamed to “{phrase}”"))
-    conn.commit()
+    if not row:return {"error":"no such shortcut"}
+    payload=jload(row["payload"]);payload["phrase"]=phrase;payload["trigger"]=normalise_key(phrase)
+    conn.execute("UPDATE memory SET subject=?,payload=?,updated_ts=? WHERE id=?",(payload["trigger"],jdump(payload),now(),memory_id));conn.execute("UPDATE shortcut_collision SET resolved=1 WHERE chosen=? OR against=?",(memory_id,memory_id));conn.execute("INSERT INTO memory_event (memory_id,ts,event,detail) VALUES (?,?,?,?)",(memory_id,now(),"edited",f"renamed to “{phrase}”"));conn.commit()
     return {"status":"renamed","id":memory_id,"phrase":phrase,"trigger":payload["trigger"]}
 
-
-def install_from_record(conn: sqlite3.Connection, record: dict[str, Any]) -> dict | None:
+def install_from_record(conn,record):
     spec=(record.get("meta") or {}).get("taught_shortcut")
-    if not spec or not spec.get("phrase"): return None
-    draft=interpret(spec["phrase"],spec.get("meaning",""),apps=spec.get("apps") or [],fires_on=spec.get("fires_on","selection"))
-    return save(conn,draft,utt_id=record.get("id"))
+    if not spec or not spec.get("phrase"):return None
+    draft=interpret(spec["phrase"],spec.get("meaning",""),apps=spec.get("apps") or [],fires_on=spec.get("fires_on","selection"));return save(conn,draft,utt_id=record.get("id"))
 
-
-def listing(conn: sqlite3.Connection) -> list[dict[str, Any]]:
-    counts=collision_counts(conn)
-    return [{**s,"collisions":counts.get(s["id"],0)} for s in _all(conn)]
+def listing(conn):
+    counts=collision_counts(conn);return [{**s,"collisions":counts.get(s["id"],0)} for s in _all(conn)]

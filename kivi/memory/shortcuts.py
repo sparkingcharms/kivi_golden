@@ -173,7 +173,7 @@ def interpret(phrase: str, meaning: str, apps: list[str] | None = None,
 def _split_clauses(meaning: str) -> list[str]:
     # Split on punctuation only. Splitting on "and" tears "add null and
     # empty-input checks" into two fragments that mean nothing apart.
-    parts = re.split(r"\s*[,;. ]\s*", meaning)
+    parts = re.split(r"\s*[,;.]\s*", meaning)
     out = []
     for p in parts:
         p = p.strip(" .,;")

@@ -16,13 +16,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Reorganize without dropping files
+      - name: Reorganize repository
         shell: bash
         run: |
           set -euo pipefail
-
           mkdir -p backend database resources docs/assets
-
           [ -d backend/kivi ] || git mv kivi backend/kivi
           [ -f backend/run.py ] || git mv run.py backend/run.py
           [ -f backend/manage.py ] || git mv manage.py backend/manage.py
@@ -40,11 +38,9 @@ jobs:
           import argparse
           import sys
           from pathlib import Path
-
           ROOT = Path(__file__).resolve().parent
           sys.path.insert(0, str(ROOT / "backend"))
           from kivi.api import app
-
           if __name__ == "__main__":
               parser = argparse.ArgumentParser()
               parser.add_argument("--port", type=int, default=8000)
@@ -56,9 +52,7 @@ jobs:
 
           python - <<'PY'
           from pathlib import Path
-
           root = Path('.')
-          files = [p for p in root.rglob('*') if p.is_file() and p.suffix.lower() in {'.py','.md','.yml','.yaml','.json'}]
           replacements = [
               ('corpus/corpus.jsonl', 'resources/corpus/corpus.jsonl'),
               ('corpus/generate.py', 'resources/corpus/generate.py'),
@@ -73,7 +67,9 @@ jobs:
               ('Kivi wireframes.pdf', 'docs/assets/Kivi wireframes.pdf'),
               ('Product Vision.pdf', 'docs/assets/Product Vision.pdf'),
           ]
-          for path in files:
+          for path in root.rglob('*'):
+              if not path.is_file() or path.suffix.lower() not in {'.py','.md','.yml','.yaml','.json'}:
+                  continue
               try:
                   text = path.read_text(encoding='utf-8')
               except (UnicodeDecodeError, OSError):
@@ -122,7 +118,7 @@ jobs:
           node --check extension/content.js
           node --check extension/popup.js
 
-          # Fail before committing if old executable/package paths remain.
+          # The package/import paths are expected to move under backend/.
           if grep -R -n --exclude-dir=.git --exclude='*.pdf' -E 'python (run|manage|verify)\.py|(^|[^[:alnum:]_])kivi/(api|config|db|local_model|trace|memory|heykivi)|(^|[^[:alnum:]_])migrations/|(^|[^[:alnum:]_])corpus/corpus\.jsonl' .; then
             echo 'Found stale paths after consolidation'
             exit 1

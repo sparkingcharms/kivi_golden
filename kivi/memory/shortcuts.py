@@ -101,7 +101,7 @@ COLLISION_MARGIN = 0.18
 # end in "this", and at a 0.62 floor a shortcut about code would fire on every
 # rewrite request. Measured over the corpus triggers, head matching separates
 # genuine matches (weakest 0.96) from non-matches (strongest 0.55) with a wide
-gap, so the floor sits in the middle of it.
+# gap, so the floor sits in the middle of it.
 TRIGGER_FLOOR = 0.75
 
 # Words that locate but do not identify. A trigger is not recognisable by them.

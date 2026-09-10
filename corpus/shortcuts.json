@@ -1,0 +1,7 @@
+[
+  {"phrase":"professorize this","meaning":"formal, three sentences, one clear ask","apps":["Gmail"],"fires_on":"selection"},
+  {"phrase":"standup-ify","meaning":"turn this into three concise bullets","apps":["Slack"],"fires_on":"selection"},
+  {"phrase":"standup iffy","meaning":"turn this into a short standup update","apps":["Slack"],"fires_on":"selection"},
+  {"phrase":"founder-tone","meaning":"direct, no hedging, one clear ask","apps":["Gmail"],"fires_on":"selection"},
+  {"phrase":"guard this","meaning":"guard this code against unsafe assumptions","apps":["Cursor"],"fires_on":"selection"}
+]

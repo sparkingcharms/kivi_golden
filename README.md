@@ -1,19 +1,15 @@
 # Kivi — semantic memory
 
-A working end-to-end product, not a prototype with a backend attached. The
-interface, the memory system, the retrieval and the evaluation are one thing,
-and every visible behaviour comes from real state in SQLite.
+A working end-to-end product, not a prototype with a backend attached. The interface, memory, retrieval and evaluation are one system, with visible behaviour backed by real SQLite state.
 
-**Run it:** see [docs/RUN.md](docs/RUN.md). Primary review method is a completely local
-application: `pip install`, `python backend/manage.py migrate`, `python backend/manage.py seed`, `python app.py`.
-No API key, no container, no database server.
+**Run it:** see [docs/RUN.md](docs/RUN.md). Primary review path: `pip install`, `python backend/manage.py migrate`, `python backend/manage.py seed`, `python app.py`.
 
 | | |
 | --- | --- |
 | Positioning statement | [`docs/POSITION.md`](docs/POSITION.md) |
 | Vision document | [`docs/VISION.md`](docs/VISION.md) |
 | How to run and review | [`docs/RUN.md`](docs/RUN.md) |
-| Evaluation results | [`evaluation/REPORT.md`](evaluation/REPORT.md) · [`results.json`](evaluation/results.json) |
+| Evaluation results | [`evaluation/REPORT.md`](evaluation/REPORT.md) · [`evaluation/results.json`](evaluation/results.json) |
 | Schema and migrations | [`database/migrations/`](database/migrations/) |
 | Corpus and generator | [`resources/corpus/`](resources/corpus/) |
 
@@ -21,167 +17,111 @@ No API key, no container, no database server.
 
 ## Use cases
 
-The build works backwards from four things a person actually does, not from
-what a memory system could infer.
-
 **1. Recover something you already said, and reuse it.**
-*"Find the dictation I did around 5 PM yesterday in Slack and polish it for the
-meeting I'm walking into."* One sentence, two requests. Episodic memory locates
-it by time and app; preference memory rewrites it. Kivi proposes; you press
-Apply.
+*"Find the dictation I did around 5 PM yesterday in Slack and polish it for the meeting I'm walking into."* One sentence, two requests. Episodic memory locates it by time and app; preference memory rewrites it. Kivi proposes; you press Apply.
 
 **2. Stop re-correcting the same word.**
-You fix *Sharvam* to *Sarvam AI* once, in place, mid-dictation. Every later
-dictation writes it correctly, in any app. This is the only kind of memory
-allowed to touch ordinary dictation, because it is Kivi fixing its own error
-rather than editing your intent.
+You fix *Sharvam* to *Sarvam AI* once, in place, mid-dictation. Later dictation writes it correctly. This is the only kind of memory allowed to touch ordinary dictation, because it fixes Kivi's own error rather than editing your intent.
 
 **3. Teach how you write, once.**
-*"Remember that I keep emails to three sentences."* It applies when you ask
-Kivi for something, and never while you are dictating. Rules name their own
-scope: a rule about Slack updates does not fire in Gmail.
+*"Remember that I keep emails to three sentences."* It applies when you ask Kivi for something, and never while you are dictating. Rules name their own scope.
 
 **4. Know what it has picked up, and take it back.**
-Everything Kivi has inferred but not earned sits visible under *Noticed, not
-applied*, with a count of how many more sightings it needs. Confirm or dismiss
-in one click. Nothing is stored that you cannot see, trace to its original
-sentence, or remove.
+Everything Kivi has inferred but not earned sits visible under *Noticed, not applied*, with a count of how many more sightings it needs. Confirm or dismiss in one click.
 
-Everything else a memory system could do here — remembering facts about the
-world from your dictation, building a profile, acting on your behalf — was
-deliberately left out. See *The shape of the decision* below.
+Everything else a memory system could do here was deliberately left out. The build answers not "what could Kivi infer" but "what should Kivi be allowed to act on".
 
----
+## Memory model
 
-## The shape of the decision
+Kivi separates four kinds of remembered context:
 
-A memory system can learn a great deal. Most of it is not worth having. The
-question this build answers is not "what could Kivi infer" but "what should
-Kivi be allowed to act on", and the answer is narrower than the capability.
+| kind | what it is | who may read it |
+| --- | --- | --- |
+| `fact` | useful personal vocabulary or stable information | dictation and Hey Kivi |
+| `preference` | a durable rule about how output is written | Hey Kivi only |
+| `episode` | one dictation, with app and time | Hey Kivi only |
+| `shortcut` | a user-defined phrase mapped to a remembered transformation | Hey Kivi only |
 
-Three kinds of memory exist here, and one boundary separates them.
+**Ordinary dictation reads facts and nothing else.** The boundary is enforced in code and recorded in each dictation trace.
 
-| kind | what it is | example | who may read it |
-| --- | --- | --- | --- |
-| `fact` | a word Kivi got wrong and you fixed | `Sharvam → Sarvam AI` | dictation **and** Hey Kivi |
-| `preference` | a durable rule about how output is written | *Keep emails to three sentences* | Hey Kivi only |
-| `episode` | one dictation, with app and time | *"Quick update: the third seed finished…"* | Hey Kivi only |
+**Hey Kivi reads everything relevant to the request.** That is where accumulated understanding belongs.
 
-**Ordinary dictation reads facts and nothing else.** This is the central
-decision. When you are dictating, Kivi is a transcription surface: it may
-replace a word it previously misheard, because that is fixing its own error.
-It may not shorten your sentence, change your register, or apply a rule you
-taught it last week — that would be Kivi editing your intent while you are
-mid-thought, and you would stop trusting what appears in the box.
+## Shortcuts
 
-**Hey Kivi reads everything.** An interactive request is you asking for
-judgement. That is where accumulated understanding belongs, and where it pays
-for itself.
+Shortcuts use a preview-first teaching flow:
 
-The boundary is enforced in code, not by convention:
-`backend/kivi/config.py → POLICY["dictation_reads"]`, applied in
-`backend/kivi/heykivi/run.py → dictate()`. Every dictation trace opens with a
-`memory_scope` step naming what it was allowed to read.
+1. Kivi interprets the phrase.
+2. Kivi reads back what it thinks the shortcut means.
+3. The user confirms before it is saved.
+4. Future matches check scope and collisions before applying.
+5. Applying a shortcut only produces a draft. Nothing is sent or posted automatically.
+
+Examples include `professorize this` and `standup-ify`. Similar triggers can be surfaced as ambiguous instead of guessed, and app scope is enforced.
 
 ## What the system refuses to learn
 
-Four categories are never stored, even when you explicitly ask
-(`POLICY["never_learn"]`): credentials, financial identifiers, health detail,
-and third-party identity numbers. The check runs before parsing, and in the
-hosted-model configuration it stays deterministic — a model is not permitted to
-decide that a password is safe to keep.
+Four categories are never stored: credentials, financial identifiers, health detail, and third-party identity numbers. The check runs before parsing, and a model is not allowed to decide that a sensitive value is safe to keep.
 
-It refuses the *value*, not the subject. "The OTP step was the block in
-onboarding" is a sentence about a product metric and is stored normally; "the
-OTP is 449281" is refused. Getting this distinction wrong in the first pass is
-what the evaluation caught (see *What went wrong* below).
-
-Beyond that, Kivi does not store the content of what you said as a fact about
-the world. If you dictate "the meeting moved to 4", Kivi keeps the episode, not
-a belief about your calendar. It learns how you write, not what is true.
+Kivi also does not turn ordinary dictation into facts about the world. If you dictate "the meeting moved to 4", Kivi keeps the episode, not a belief about your calendar.
 
 ## The promotion gate
 
-An explicit instruction or an in-place correction becomes active immediately —
-you said it, and asking again would be rude.
+An explicit instruction or in-place correction becomes active immediately.
 
-Behaviour that Kivi merely noticed does not. It is stored as `observed`,
-**never applied**, and shown to you with a count: *"you edited Kivi's output —
-noticed, not applied · 2 more sightings before it applies"*. It activates after
-three independent sightings, or the moment you press *Make it a rule*.
-
-This is how the product keeps you in control without making you its
-administrator. There is no settings page to maintain. The only things asking
-for your attention are the handful of guesses Kivi has not earned yet, and you
-can confirm or dismiss each in one click.
+Behaviour Kivi merely noticed does not. It is stored as `observed`, never applied, and shown with a count. It activates after three independent sightings, or when you press *Make it a rule*.
 
 ## Conflicts
 
-A new rule does not win by being newer. If it contradicts an active rule with
-the same scope, it is held and both are shown to you. Scope is not a conflict:
-a rule about Slack and a rule about Gmail cannot contradict each other, and a
-preference for bullets with no count does not contradict a rule naming three.
-
-Rules also carry the surface they name. *"Always keep my Slack updates to three
-bullets"* compiles to `applies_to: Slack` and does not fire when you are
-drafting in Gmail.
+A new rule does not automatically win by being newer. If it contradicts an active rule with the same scope, it is held and both are shown. Scope is enforced, so a Slack rule does not fire in Gmail.
 
 ## The tools
 
-Five, chosen from the use cases rather than from what was possible.
-
 | tool | serves |
 | --- | --- |
-| `find_dictation` | *"find the dictation I did around 5 PM yesterday in Slack"* |
-| `reshape` | *"…and polish it for the meeting I'm walking into"* |
-| `recall` | *"what rules are you following for my emails"* |
-| `draft_message` | *"tell Arjun the latency numbers are ready"* |
-| `remember` / `forget` | teaching and unteaching, by voice |
+| `find_dictation` | recover a past dictation |
+| `reshape` | rewrite selected text |
+| `recall` | inspect remembered rules |
+| `draft_message` | prepare a message |
+| `remember` / `forget` | teaching and unteaching |
 
-No tool sends, posts, commits, or writes into another application. Every result
-is a proposal with an Apply button. The transport is you.
+No tool sends, posts, commits, or writes into another application. Every result is a proposal with an Apply step.
 
 ## Architecture
 
-```
-web/index.html          the interface — desktop simulation, Hey Kivi panel,
-                        memory surface, and a "why did Kivi do that" drawer
+```text
+web/index.html          interface and inspection surface
    │  HTTP
-backend/kivi/api.py     Flask: /api/dictate, /api/ask, /api/memory, /api/trace
-backend/kivi/heykivi/   routing, abstention, tool chaining, the dictation path
-backend/kivi/memory/    creation, promotion, conflict, supersession, provenance
-backend/kivi/llm.py     adapter: local (default) | anthropic
-backend/kivi/local_model.py deterministic intent, extraction, reshaping
-backend/kivi/trace.py  per-request decision record
+backend/kivi/api.py     Flask API
+backend/kivi/heykivi/   routing, abstention, tools, dictation path
+backend/kivi/memory/    creation, promotion, conflicts, provenance, shortcuts
+backend/kivi/llm.py     model adapter
+backend/kivi/local_model.py deterministic local behaviour
+backend/kivi/trace.py   per-request decision record
    │
 SQLite                  utterance · memory · memory_event · trace · trace_step
 ```
 
-The repository is organized so the backend is one unit under `backend/`, data
-under `resources/`, schema under `database/`, evaluation under `evaluation/`,
-and the browser surface under `extension/`.
-
-## Database, schema and migrations
-
-Embedded SQLite at `data/kivi.db`. The schema lives in `database/migrations/` and
-runs once in filename order inside a transaction.
+The repository is organized with the backend under `backend/`, seed data under `resources/`, schema under `database/`, evaluation under `evaluation/`, browser integration under `extension/`, and product/run documents under `docs/`.
 
 ## Evaluation
 
-`python evaluation/run_eval.py` runs the corpus through the real ingestion path
-and then the fixed Hey Kivi cases. Current results are retained in
-`evaluation/results.json` and summarized in `evaluation/REPORT.md`.
+`python evaluation/run_eval.py` runs the corpus through the real ingestion path and the fixed Hey Kivi cases. Results are retained in `evaluation/results.json` and summarized in `evaluation/REPORT.md`.
 
-## Reproducibility
+`python backend/verify.py` checks the stack in one command.
 
-- `python backend/verify.py` checks the stack in one command.
-- `python resources/corpus/generate.py` regenerates the synthetic corpus.
-- `python backend/manage.py seed` loads it through the real ingestion path.
-- `python evaluation/run_eval.py` re-runs the evaluation harness.
+## Chrome extension
+
+The extension connects selected text in browser pages to the local Kivi backend. It is selection-based and does not send or post content itself.
+
+Load `extension/` through Chrome's **Load unpacked** flow. The extension expects Kivi at `http://127.0.0.1:8000`.
+
+## Design documents
+
+- `docs/POSITION.md` contains the Kivi position statement.
+- `docs/VISION.md` contains the product vision.
+- `docs/PRODUCT_CONTEXT.md` explains the relationship between Kivi and this Golden Goose implementation.
+- `docs/assets/` contains the submitted visual/product assets.
 
 ## Use of AI in this work
 
-The implementation in this repository was built with Claude; the product
-positioning and vision documents are the author's own work. The consequential
-memory boundaries, promotion gate, refusal policy, tools, evaluation design,
-and product decisions remain explicitly defended in this repository.
+The implementation was built with Claude; the product positioning and vision documents are the author's own work. The consequential memory boundaries, promotion gate, refusal policy, tools, evaluation design, and product decisions are explicitly defended in this repository.

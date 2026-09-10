@@ -54,7 +54,12 @@ def main():
         if mf.get("manifest_version")!=3:problems.append("not manifest v3")
         hosts=" ".join(mf.get("host_permissions",[]))
         if "127.0.0.1:8000" not in hosts:problems.append("backend not in host_permissions")
-        for f in [*(mf.get("content_scripts":[{}])[0].get("js",[])),*(mf.get("content_scripts":[{}])[0].get("css",[])),mf.get("background",{}).get("service_worker"),mf.get("action",{}).get("default_popup")]:
+        scripts=mf.get("content_scripts") or [{}]
+        first=scripts[0] if scripts else {}
+        referenced=list(first.get("js",[]))+list(first.get("css",[]))
+        if mf.get("background",{}).get("service_worker"): referenced.append(mf["background"]["service_worker"])
+        if mf.get("action",{}).get("default_popup"): referenced.append(mf["action"]["default_popup"])
+        for f in referenced:
             if f and not(ROOT/"extension"/f).exists():problems.append(f"missing {f}")
         for icon in (mf.get("icons") or {}).values():
             if not(ROOT/"extension"/icon).exists():problems.append(f"missing icon {icon}")

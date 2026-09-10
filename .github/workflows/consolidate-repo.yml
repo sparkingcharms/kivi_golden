@@ -1,0 +1,142 @@
+name: Consolidate repository
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  consolidate:
+    if: ${{ !startsWith(github.event.head_commit.message, 'Consolidate repository') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reorganize without dropping files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # The new locations are created first. Nothing is removed until its
+          # replacement exists and all references have been updated.
+          mkdir -p backend database resources docs/assets
+
+          [ -d backend/kivi ] || git mv kivi backend/kivi
+          [ -f backend/run.py ] || git mv run.py backend/run.py
+          [ -f backend/manage.py ] || git mv manage.py backend/manage.py
+          [ -f backend/verify.py ] || git mv verify.py backend/verify.py
+          [ -d database/migrations ] || git mv migrations database/migrations
+          [ -d resources/corpus ] || git mv corpus resources/corpus
+          [ -f docs/RUN.md ] || git mv RUN.md docs/RUN.md
+          [ -f docs/assets/'Kivi wireframes.pdf' ] || git mv 'Kivi wireframes.pdf' docs/assets/'Kivi wireframes.pdf'
+          [ -f docs/assets/'Product Vision.pdf' ] || git mv 'Product Vision.pdf' docs/assets/'Product Vision.pdf'
+          [ -f docs/PRODUCT_CONTEXT.md ] || git mv PRODUCT_CONTEXT.md docs/PRODUCT_CONTEXT.md
+
+          # Root launcher keeps the review command simple.
+          cat > app.py <<'PY'
+          #!/usr/bin/env python3
+          """Start the local Kivi application."""
+          import argparse
+          import sys
+          from pathlib import Path
+
+          ROOT = Path(__file__).resolve().parent
+          sys.path.insert(0, str(ROOT / "backend"))
+          from kivi.api import app
+
+          if __name__ == "__main__":
+              parser = argparse.ArgumentParser()
+              parser.add_argument("--port", type=int, default=8000)
+              parser.add_argument("--host", default="127.0.0.1")
+              args = parser.parse_args()
+              print(f"Kivi on http://{args.host}:{args.port}")
+              app.run(host=args.host, port=args.port, debug=False)
+          PY
+
+          # Update repository paths. Package-relative imports remain intact
+          # because backend is added to sys.path by the entry points.
+          python - <<'PY'
+          from pathlib import Path
+
+          root = Path('.')
+          text_files = [p for p in root.rglob('*') if p.is_file() and p.suffix.lower() in {'.py','.md','.yml','.yaml','.json'}]
+          replacements = {
+              'corpus/corpus.jsonl': 'resources/corpus/corpus.jsonl',
+              'corpus/generate.py': 'resources/corpus/generate.py',
+              'corpus/shortcuts.json': 'resources/corpus/shortcuts.json',
+              'corpus/': 'resources/corpus/',
+              'migrations/': 'database/migrations/',
+              'python run.py': 'python app.py',
+              'python manage.py': 'python backend/manage.py',
+              'python verify.py': 'python backend/verify.py',
+              'RUN.md': 'docs/RUN.md',
+              'PRODUCT_CONTEXT.md': 'docs/PRODUCT_CONTEXT.md',
+              'Kivi wireframes.pdf': 'docs/assets/Kivi wireframes.pdf',
+              'Product Vision.pdf': 'docs/assets/Product Vision.pdf',
+          }
+          for path in text_files:
+              try:
+                  s = path.read_text(encoding='utf-8')
+              except (UnicodeDecodeError, OSError):
+                  continue
+              old = s
+              for a, b in replacements.items():
+                  s = s.replace(a, b)
+              if s != old:
+                  path.write_text(s, encoding='utf-8')
+
+          # Files moved under backend now need the repository root for data,
+          # migrations and the web surface. Keep package imports unchanged.
+          p = Path('backend/kivi/config.py')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('ROOT = Path(__file__).resolve().parent.parent', 'ROOT = Path(__file__).resolve().parents[2]')
+          p.write_text(s, encoding='utf-8')
+
+          p = Path('backend/kivi/api.py')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('WEB = Path(__file__).resolve().parent.parent / "web"', 'WEB = Path(__file__).resolve().parents[2] / "web"')
+          p.write_text(s, encoding='utf-8')
+
+          # Evaluation lives outside backend, so explicitly expose backend.
+          p = Path('evaluation/run_eval.py')
+          if p.exists():
+              s = p.read_text(encoding='utf-8')
+              s = s.replace('sys.path.insert(0, str(ROOT))', 'sys.path.insert(0, str(ROOT / "backend"))')
+              p.write_text(s, encoding='utf-8')
+
+          # Backend scripts already run from backend/, but make their root
+          # paths explicit where the old script directory was used as ROOT.
+          for name in ('manage.py', 'verify.py'):
+              p = Path('backend') / name
+              if not p.exists():
+                  continue
+              s = p.read_text(encoding='utf-8')
+              s = s.replace('ROOT=Path(__file__).resolve().parent;', 'ROOT=Path(__file__).resolve().parent.parent;')
+              s = s.replace('ROOT = Path(__file__).resolve().parent', 'ROOT = Path(__file__).resolve().parent.parent')
+              s = s.replace('sys.path.insert(0,str(ROOT))', 'sys.path.insert(0,str(Path(__file__).resolve().parent))')
+              s = s.replace('sys.path.insert(0, str(ROOT))', 'sys.path.insert(0, str(Path(__file__).resolve().parent))')
+              p.write_text(s, encoding='utf-8')
+          PY
+
+          # Ensure the new package path and generated launcher compile before
+          # any old path is removed from the tree.
+          python -m compileall -q backend evaluation app.py
+          node --check extension/background.js
+          node --check extension/content.js
+          node --check extension/popup.js
+
+          # Check for stale executable paths in source/docs, excluding history.
+          if grep -R -n --exclude-dir=.git --exclude='*.pdf' -E '(^|[^[:alnum:]_])(python (run|manage|verify)\.py|kivi/(api|config|db|local_model|trace|memory|heykivi)|migrations/|corpus/corpus\.jsonl)' .; then
+            echo 'Found stale paths after consolidation'
+            exit 1
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Consolidate repository structure'
+          git push

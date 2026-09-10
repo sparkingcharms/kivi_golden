@@ -1,33 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "Kivi — voice layer",
+  "name": "Kivi - voice layer",
   "version": "0.1.0",
   "description": "Select something on any page, speak an instruction, and Kivi proposes a change. Nothing is applied until you press Apply.",
-
   "permissions": ["activeTab", "scripting", "storage"],
-  "host_permissions": [
-    "http://127.0.0.1:8000/*",
-    "http://localhost:8000/*"
-  ],
-
+  "host_permissions": ["http://127.0.0.1:8000/*", "http://localhost:8000/*"],
   "background": { "service_worker": "background.js" },
-
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Kivi",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
+    "default_title": "Kivi"
   },
-
-  "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
-  },
-
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -40,7 +22,6 @@
       "run_at": "document_idle"
     }
   ],
-
   "commands": {
     "open-kivi": {
       "suggested_key": { "default": "Ctrl+Shift+K", "mac": "Command+Shift+K" },

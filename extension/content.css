@@ -1,0 +1,7 @@
+/* Keep the host element isolated from page layout and stacking rules. */
+#kivi-root {
+  all: initial;
+  position: fixed !important;
+  inset: auto !important;
+  z-index: 2147483647 !important;
+}

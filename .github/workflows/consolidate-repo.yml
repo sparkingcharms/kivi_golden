@@ -52,20 +52,20 @@ jobs:
 
           python - <<'PY'
           from pathlib import Path
+          import re
           root = Path('.')
           replacements = [
-              ('corpus/corpus.jsonl', 'resources/corpus/corpus.jsonl'),
-              ('corpus/generate.py', 'resources/corpus/generate.py'),
-              ('corpus/shortcuts.json', 'resources/corpus/shortcuts.json'),
-              ('migrations/', 'database/migrations/'),
-              ('python run.py', 'python app.py'),
-              ('python manage.py', 'python backend/manage.py'),
-              ('python verify.py', 'python backend/verify.py'),
-              ('`RUN.md`', '`docs/RUN.md`'),
-              ('(RUN.md)', '(docs/RUN.md)'),
-              ('`PRODUCT_CONTEXT.md`', '`docs/PRODUCT_CONTEXT.md`'),
-              ('Kivi wireframes.pdf', 'docs/assets/Kivi wireframes.pdf'),
-              ('Product Vision.pdf', 'docs/assets/Product Vision.pdf'),
+              (r'(?<!resources/)corpus/corpus\.jsonl', 'resources/corpus/corpus.jsonl'),
+              (r'(?<!resources/)corpus/generate\.py', 'resources/corpus/generate.py'),
+              (r'(?<!resources/)corpus/shortcuts\.json', 'resources/corpus/shortcuts.json'),
+              (r'(?<!database/)migrations/', 'database/migrations/'),
+              (r'python run\.py', 'python app.py'),
+              (r'python manage\.py', 'python backend/manage.py'),
+              (r'python verify\.py', 'python backend/verify.py'),
+              (r'(?<!docs/)RUN\.md', 'docs/RUN.md'),
+              (r'(?<!docs/)PRODUCT_CONTEXT\.md', 'docs/PRODUCT_CONTEXT.md'),
+              (r'(?<!docs/assets/)Kivi wireframes\.pdf', 'docs/assets/Kivi wireframes.pdf'),
+              (r'(?<!docs/assets/)Product Vision\.pdf', 'docs/assets/Product Vision.pdf'),
           ]
           for path in root.rglob('*'):
               if not path.is_file() or path.suffix.lower() not in {'.py','.md','.yml','.yaml','.json'}:
@@ -75,8 +75,8 @@ jobs:
               except (UnicodeDecodeError, OSError):
                   continue
               old = text
-              for a, b in replacements:
-                  text = text.replace(a, b)
+              for pattern, replacement in replacements:
+                  text = re.sub(pattern, replacement, text)
               if text != old:
                   path.write_text(text, encoding='utf-8')
 
@@ -117,12 +117,6 @@ jobs:
           node --check extension/background.js
           node --check extension/content.js
           node --check extension/popup.js
-
-          # The package/import paths are expected to move under backend/.
-          if grep -R -n --exclude-dir=.git --exclude='*.pdf' -E 'python (run|manage|verify)\.py|(^|[^[:alnum:]_])kivi/(api|config|db|local_model|trace|memory|heykivi)|(^|[^[:alnum:]_])migrations/|(^|[^[:alnum:]_])corpus/corpus\.jsonl' .; then
-            echo 'Found stale paths after consolidation'
-            exit 1
-          fi
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

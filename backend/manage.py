@@ -2,18 +2,16 @@
 from __future__ import annotations
 import argparse,json,sys
 from pathlib import Path
-ROOT=Path(__file__).resolve().parent;sys.path.insert(0,str(ROOT))
+ROOT=Path(__file__).resolve().parent.parent;sys.path.insert(0,str(ROOT/"backend"))
 from kivi import corpus_io,db as dbmod,trace as trace_mod
 from kivi.config import CORPUS_PATH,DB_PATH
 from kivi.heykivi.run import dictate
 from kivi.memory import shortcuts,store
-SHORTCUT_FIXTURES=ROOT/"corpus"/"shortcuts.json"
-
+SHORTCUT_FIXTURES=ROOT/"resources"/"corpus"/"shortcuts.json"
 def cmd_migrate(args):
  conn=dbmod.connect(auto_migrate=False);todo=dbmod.pending(conn)
  if not todo:print(f"database at {DB_PATH} is up to date ({len(dbmod.applied(conn))} migration(s) applied)");conn.close();return 0
  print(f"applying {len(todo)} migration(s) to {DB_PATH}");dbmod.migrate(conn,verbose=True);conn.close();return 0
-
 def _install_shortcut_fixtures(conn):
  if not SHORTCUT_FIXTURES.exists():return 0
  added=0
@@ -21,7 +19,6 @@ def _install_shortcut_fixtures(conn):
   draft=shortcuts.interpret(spec["phrase"],spec["meaning"],apps=spec.get("apps",[]),fires_on=spec.get("fires_on","selection"))
   if not conn.execute("SELECT 1 FROM memory WHERE kind='shortcut' AND subject=? AND status='active'",(draft["trigger"],)).fetchone():shortcuts.save(conn,draft);added+=1
  return added
-
 def _load(conn,path,limit=None):
  n=bad=0
  for lineno,rec,err in corpus_io.read(path):
@@ -31,22 +28,18 @@ def _load(conn,path,limit=None):
   if n%100==0:print(f"  {n}…")
  if bad:print(f"  {bad} record(s) skipped")
  return n
-
 def cmd_seed(args):
  path=Path(args.file) if args.file else CORPUS_PATH
  if not path.exists():print(f"no corpus at {path}",file=sys.stderr);return 1
  conn=dbmod.connect();existing=conn.execute("SELECT COUNT(*) c FROM utterance").fetchone()["c"]
  if existing and not args.force:print(f"already seeded ({existing} utterances). Use --force or reset --seed.");conn.close();return 0
  print(f"loading {path}");n=_load(conn,path,args.limit);added=_install_shortcut_fixtures(conn);counts=_counts(conn);conn.close();print(f"loaded {n} utterances and {added} shortcut fixtures");print(f"  facts {counts['fact']} · shortcuts {counts['shortcut']} · rules {counts['preference']} · episodes {counts['episode']}");return 0
-
 def cmd_import(args):
  path=Path(args.file)
  if not path.exists():print(f"no such file: {path}",file=sys.stderr);return 1
  conn=dbmod.connect();print(f"importing {path}");n=_load(conn,path,args.limit);counts=_counts(conn);conn.close();print(f"imported {n} utterances");print(f"  facts {counts['fact']} · shortcuts {counts['shortcut']} · rules {counts['preference']} · episodes {counts['episode']}");return 0
-
 def cmd_reset(args):
  dbmod.reset(DB_PATH);print(f"removed {DB_PATH}");conn=dbmod.connect(auto_migrate=False);dbmod.migrate(conn,verbose=True);conn.close();return cmd_seed(argparse.Namespace(file=None,force=True,limit=None)) if args.seed else 0
-
 def _counts(conn):return {k:conn.execute("SELECT COUNT(*) c FROM memory WHERE kind=? AND status IN ('active','observed')",(k,)).fetchone()["c"] for k in ("fact","preference","episode","shortcut")}
 def cmd_status(args):
  conn=dbmod.connect(auto_migrate=False);done=sorted(dbmod.applied(conn));todo=dbmod.pending(conn);print(f"database      {DB_PATH}\nsize          {dbmod.db_size_bytes(DB_PATH):,} bytes\nmigrations    {len(done)} applied"+(f", {len(todo)} pending: {todo}" if todo else ""));[print(f"              {v}") for v in done]
@@ -57,7 +50,6 @@ def cmd_status(args):
    n=conn.execute("SELECT COUNT(*) c FROM memory WHERE kind=? AND status=?",(kind,status)).fetchone()["c"]
    if n:print(f"  {kind:11s} {status:9s} {n}")
  print(f"traces        {conn.execute('SELECT COUNT(*) c FROM trace').fetchone()['c']}");conn.close();return 0
-
 def cmd_inspect(args):
  conn=dbmod.connect()
  if args.trace:
@@ -73,7 +65,6 @@ def cmd_inspect(args):
   u=conn.execute("SELECT * FROM utterance WHERE id=?",(row['source_utt'],)).fetchone()
   if u:print(f"came from   {u['id']} in {u['app']}\n            \"{u['raw_asr']}\"")
  print("history:");[print(f"  {e['event']:10s} {e['detail']}") for e in store.history(conn,args.memory_id)];conn.close();return 0
-
 def main():
  ap=argparse.ArgumentParser();sub=ap.add_subparsers(dest='cmd',required=True);sub.add_parser('migrate').set_defaults(fn=cmd_migrate)
  p=sub.add_parser('seed');p.add_argument('--file');p.add_argument('--limit',type=int);p.add_argument('--force',action='store_true');p.set_defaults(fn=cmd_seed)

@@ -1,22 +1,37 @@
 # Kivi Golden Goose · Start Here
 
-This is the working Golden Goose implementation of **Remember** inside the same Kivi product described in the UI/UX work.
+This repository is the working Golden Goose implementation of **Remember** inside the Kivi product.
 
-Read these in order:
+## Read these first
 
-1. [`PRODUCT_CONTEXT.md`](PRODUCT_CONTEXT.md) — the shared Kivi product direction and the consistency rules.
-2. [`docs/POSITION.md`](docs/POSITION.md) — the Kivi product position.
-3. [`docs/VISION.md`](docs/VISION.md) — the Kivi product vision.
-4. [`research/User Interviews.md`](research/User%20Interviews.md) — interview questions and insights.
-5. [`research/Market Gaps and User Personas.md`](research/Market%20Gaps%20and%20User%20Personas.md) — market gaps and personas.
-6. [`research/Kivi Wireframes.md`](research/Kivi%20Wireframes.md) — the interaction and visual reference from the Kivi wireframes.
-7. [`research/Product Video Transcript.md`](research/Product%20Video%20Transcript.md) — the product behaviour and interaction reference.
-8. [`RUN.md`](RUN.md) — run the implemented Golden Goose experience.
+1. [`docs/PRODUCT_CONTEXT.md`](docs/PRODUCT_CONTEXT.md) · how this implementation fits the broader Kivi product
+2. [`docs/POSITION.md`](docs/POSITION.md) · Kivi's product position
+3. [`docs/VISION.md`](docs/VISION.md) · product vision
+4. [`docs/RUN.md`](docs/RUN.md) · setup, verification and evaluation
+5. [`README.md`](README.md) · architecture, memory model and product decisions
+6. [`evaluation/REPORT.md`](evaluation/REPORT.md) · evaluation summary
 
-## The relationship between the two submissions
+The submitted visual references are in [`docs/assets/`](docs/assets/).
 
-The UI/UX work defines the broader Kivi product: a personal multilingual voice layer across the computer, entered through Kivi Anywhere or Kivi Mic, organised around Think, Write, Understand, Communicate and Remember.
+## What this implementation proves
 
-Golden Goose goes deep on **Remember**. It implements the memory layer that makes the broader Kivi experience personal over time, while preserving the same voice + screen + intent model, preview/apply interaction and user control.
+Golden Goose goes deep on **Remember** rather than trying to rebuild every Kivi capability. It implements persistent memory with provenance, refusal boundaries, promotion gates, conflict handling, episodic retrieval and user-defined shortcuts.
 
-The goal is not to make Golden Goose a second Kivi. It is to make one important part of Kivi real.
+The core interaction remains the Kivi model: voice gives the intent, the current screen provides context, Kivi proposes a result, and the user remains the final transport. No tool sends, posts or performs external actions automatically.
+
+## Quick start
+
+```bash
+pip install -r requirements.txt
+python backend/manage.py migrate
+python backend/manage.py seed
+python app.py
+```
+
+Open `http://127.0.0.1:8000`.
+
+For a complete check:
+
+```bash
+python backend/verify.py
+```

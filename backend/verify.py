@@ -3,7 +3,7 @@
 from __future__ import annotations
 import json, os, socket, sys, time
 from pathlib import Path
-ROOT=Path(__file__).resolve().parent; SCRATCH=ROOT/"data"/"verify.db"; os.environ["KIVI_DB"]=str(SCRATCH)
+ROOT=Path(__file__).resolve().parent.parent; SCRATCH=ROOT/"data"/"verify.db"; os.environ["KIVI_DB"]=str(SCRATCH)
 PASS,FAIL,WARN="PASS","FAIL","WARN"; results=[]
 def check(name,status,detail=""):
     results.append((name,status,detail)); print(f"[{ {PASS:'  ok  ',FAIL:' FAIL ',WARN:' warn '}[status]}] {name}"+(f" — {detail}" if detail else ""))
@@ -13,7 +13,7 @@ def main():
     else:check("Python 3.10 or newer",FAIL);return report()
     try:import flask;check("Flask installed",PASS)
     except ImportError:check("Flask installed",FAIL,"run: pip install -r requirements.txt");return report()
-    required=["run.py","manage.py","requirements.txt","README.md","RUN.md","web/index.html","corpus/corpus.jsonl","evaluation/run_eval.py","migrations/001_initial.sql","docs/POSITION.md","docs/VISION.md","migrations/003_shortcuts.sql","kivi/memory/shortcuts.py","extension/manifest.json","extension/content.js","extension/background.js","extension/popup.html","extension/popup.js","extension/icons/icon128.png"]
+    required=["app.py","backend/manage.py","requirements.txt","README.md","docs/RUN.md","web/index.html","resources/corpus/corpus.jsonl","evaluation/run_eval.py","database/migrations/001_initial.sql","docs/POSITION.md","docs/VISION.md","database/migrations/003_shortcuts.sql","backend/kivi/memory/shortcuts.py","extension/manifest.json","extension/content.js","extension/background.js","extension/popup.html","extension/popup.js"]
     missing=[f for f in required if not(ROOT/f).exists()]
     check("All required files present",FAIL if missing else PASS,f"missing: {', '.join(missing)}" if missing else f"{len(required)} checked")
     placeholder=any("REPLACE THIS ENTIRE FILE" in (ROOT/d).read_text(encoding="utf8") or "paste your" in (ROOT/d).read_text(encoding="utf8") for d in ("docs/POSITION.md","docs/VISION.md"))
@@ -22,10 +22,9 @@ def main():
     if SCRATCH.exists():dbmod.reset(SCRATCH)
     conn=dbmod.connect(SCRATCH,auto_migrate=False); applied=dbmod.migrate(conn); tables={r["name"] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}; expected={"utterance","memory","memory_event","trace","trace_step","schema_migrations","shortcut_collision"}
     check("Migrations create the schema",PASS if expected<=tables else FAIL,f"{len(applied)} applied, {len(expected)} expected tables")
-    check("Migrations are idempotent",PASS if not dbmod.pending(conn) else FAIL,str(dbmod.pending(conn)))
-    conn.close()
+    check("Migrations are idempotent",PASS if not dbmod.pending(conn) else FAIL,str(dbmod.pending(conn))); conn.close()
     from kivi import corpus_io
-    try:records=corpus_io.load(ROOT/"corpus"/"corpus.jsonl");age_h=(time.time()-max(r["ts"] for r in records))/3600;check("Corpus loads and rebases",PASS,f"{len(records)} records, newest {age_h:.0f}h old")
+    try:records=corpus_io.load(ROOT/"resources"/"corpus"/"corpus.jsonl");age_h=(time.time()-max(r["ts"] for r in records))/3600;check("Corpus loads and rebases",PASS,f"{len(records)} records, newest {age_h:.0f}h old")
     except Exception as e:check("Corpus loads and rebases",FAIL,str(e));return report()
     from kivi.heykivi.run import ask,dictate
     from kivi.memory import shortcuts
@@ -54,11 +53,9 @@ def main():
         if mf.get("manifest_version")!=3:problems.append("not manifest v3")
         hosts=" ".join(mf.get("host_permissions",[]))
         if "127.0.0.1:8000" not in hosts:problems.append("backend not in host_permissions")
-        scripts=mf.get("content_scripts") or [{}]
-        first=scripts[0] if scripts else {}
-        referenced=list(first.get("js",[]))+list(first.get("css",[]))
-        if mf.get("background",{}).get("service_worker"): referenced.append(mf["background"]["service_worker"])
-        if mf.get("action",{}).get("default_popup"): referenced.append(mf["action"]["default_popup"])
+        scripts=mf.get("content_scripts") or [{}]; first=scripts[0] if scripts else {}; referenced=list(first.get("js",[]))+list(first.get("css",[]))
+        if mf.get("background",{}).get("service_worker"):referenced.append(mf["background"]["service_worker"])
+        if mf.get("action",{}).get("default_popup"):referenced.append(mf["action"]["default_popup"])
         for f in referenced:
             if f and not(ROOT/"extension"/f).exists():problems.append(f"missing {f}")
         for icon in (mf.get("icons") or {}).values():

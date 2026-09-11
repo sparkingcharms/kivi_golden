@@ -125,5 +125,3 @@ Load `extension/` through Chrome's **Load unpacked** flow. The extension expects
 ## Use of AI in this work
 
 The implementation was built with Claude; the product positioning and vision documents are the author's own work. The consequential memory boundaries, promotion gate, refusal policy, tools, evaluation design, and product decisions are explicitly defended in this repository.
-
-<!-- consolidation trigger -->
